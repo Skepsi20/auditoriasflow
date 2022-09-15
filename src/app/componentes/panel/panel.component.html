@@ -1,0 +1,54 @@
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer class="example-sidenav" [opened]="true" mode="side">
+    <div class="row mb-5">
+      <div class="col">
+        <img src="../../../assets/img/Flowserve-Logo.jpg" alt="Flowserve logo" class="logo">
+      </div>
+    </div><!--
+    <div class="row">
+      <div class="col mb-4 mt-2 textLogo">
+        <h4>TLAXCALA</h4>
+      </div>
+    </div> -->
+    <div class="row mt-5">
+      <div class="col" align="left">
+        <button (click)="seleccionMenu('agenda')" class="btn menuOption">
+          EVENTOS
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" align="left">
+        <button (click)="seleccionMenu('graficos')" class="btn menuOption">
+          RESULTADOS
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" align="left">
+        <button (click)="seleccionMenu('empleados')" class="btn menuOption">
+          COLABORADORES
+        </button>
+      </div>
+    </div>
+  </mat-drawer>
+
+  <div class="example-sidenav-content">
+    <button type="button" mat-button (click)="drawer.toggle()" class="toggleButton">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#E2231A" class="bi bi-list" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+      </svg>
+    </button>
+
+    <div *ngIf="opcionMenu == 'agenda'">
+      <agenda></agenda>
+    </div>
+    <div *ngIf="opcionMenu == 'graficos'">
+      <graphics></graphics>
+    </div>
+    <div *ngIf="opcionMenu == 'empleados'">
+      <empleados></empleados>
+    </div>
+  </div>
+
+</mat-drawer-container>

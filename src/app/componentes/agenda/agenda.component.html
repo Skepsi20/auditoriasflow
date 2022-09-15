@@ -1,0 +1,205 @@
+<div class="contenedor" style="padding-bottom:4rem; padding-top: 4rem;">
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="border-bottom: 2px solid #0d6efd; width: 100%;">
+    <li class="nav-item" role="presentation"><button class="nav-link active optionButton" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true" (click)="menuOption = 'uno'">Creación de eventos</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link optionButton" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" (click)="menuOption = 'dos'">Listado de eventos</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link optionButton" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false" (click)="[mostrar = true, menuOption = 'tres']">Calendario</button></li>
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0" style="background-color: transparent; color:black">
+      <div class="col mt-2">
+        <div class="card text-center">
+          <div class="card-header">
+            <p class="title">Creación de eventos</p>
+          </div>
+          <div class="card-body" align="left">
+            <form #employeeForm="ngForm" class="formulario">
+              <div class="row">
+                <div class="col">
+                  <!-- Name -->
+                  <p>
+                    <mat-form-field appearance="outline" style="width: 100%">
+                      <mat-label>Nombre</mat-label>
+                      <input type="text" matInput [(ngModel)]="evento.name" name="name" (keyup)="checkForm()" required>
+                    </mat-form-field>
+                  </p>
+                </div>
+                <div class="col">
+                  <!-- Description -->
+                  <p>
+                    <mat-form-field appearance="outline" style="width: 100%">
+                      <mat-label>Descripción</mat-label>
+                      <input type="text" matInput [(ngModel)]="evento.description" name="description" (keyup)="checkForm()" required>
+                    </mat-form-field>
+                  </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <!-- Start Date Time and End Date Time -->
+                  <p>
+                    <mat-form-field appearance="outline" class="example-form-field" style="width: 100%;">
+                      <mat-label>Fecha</mat-label>
+                      <mat-date-range-input [rangePicker]="rangePicker">
+                        <input matStartDate placeholder="Inicio">
+                        <input matEndDate placeholder="Fin">
+                      </mat-date-range-input>
+                      <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+                      <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+                      <mat-date-range-picker #rangePicker>
+                        <mat-date-range-picker-actions>
+                          <button mat-button matDateRangePickerCancel>Cancel</button>
+                          <button mat-raised-button color="primary" matDateRangePickerApply (click)="showDates(rangePicker)">Apply</button>
+                        </mat-date-range-picker-actions>
+                      </mat-date-range-picker>
+                    </mat-form-field><br>
+                  </p>
+                </div>
+                <div class="col">
+                  <!-- Empleados -->
+                  <p>
+                    <mat-form-field appearance="outline" style="width: 100%;">
+                      <mat-label>Encargado</mat-label>
+                      <mat-select [(ngModel)]="evento.assignedTo" name="empleado" (ngModelChange)="checkForm()">
+                        <mat-option *ngFor="let empleado of employees" [value]="empleado.id">
+                          {{empleado.firstName}} {{empleado.lastName}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </p>
+                </div>
+                <div class="col">
+                  <!-- Formulario -->
+                  <p>
+                    <mat-form-field appearance="outline" style="width: 100%;">
+                      <mat-label>Auditoría</mat-label>
+                      <mat-select [(ngModel)]="evento.formId" name="auditoria" (ngModelChange)="checkForm()">
+                        <mat-option *ngFor="let form of forms" [value]="form.id">
+                          {{form.name}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </p>
+                </div>
+              </div>
+            </form>
+            <div class="alert alert-danger" *ngIf="!formReady" role="alert" style="text-align:center">
+              Todos los campos son necesarios
+            </div>
+          </div>
+          <div class="card-footer text-muted">
+            <div *ngIf="formReady">
+              <button class="btn btn-success" (click)="add()">
+                Crear
+              </button>
+            </div>
+            <div *ngIf="!formReady">
+              <button class="btn btn-dark">
+                Crear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0" style="background-color: transparent; color:black">
+      <div class="col mt-2" align="left">
+        <div class="card">
+          <div class="card-header">
+            <p class="title">Busqueda de eventos</p>
+          </div>
+          <div class="card-body">
+            <div class="example-container mat-elevation-z8">
+              <div class="example-header">
+                <mat-form-field appearance="standard">
+                  <mat-label style="padding:10px">Buscar</mat-label>
+                  <input matInput (keyup)="applyFilter($event)" placeholder="Rutina"#input>
+                </mat-form-field>
+              </div>
+              <table mat-table [dataSource]="dataSource" matSort style="width:100%">
+                <ng-container matColumnDef="nombre">
+                  <th mat-header-cell *matHeaderCellDef> Nombre </th>
+                  <td mat-cell *matCellDef="let row"> {{row.name}}</td>
+                </ng-container>
+                <ng-container matColumnDef="descripcion">
+                  <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                  <td mat-cell *matCellDef="let row"> {{row.description}} </td>
+                </ng-container>
+                <ng-container matColumnDef="fecha">
+                  <th mat-header-cell *matHeaderCellDef> Fecha </th>
+                  <td mat-cell *matCellDef="let row"> {{row.date}} </td>
+                </ng-container>
+                <ng-container matColumnDef="encargado">
+                  <th mat-header-cell *matHeaderCellDef> Encargado </th>
+                  <td mat-cell *matCellDef="let row"> {{row.employee}} </td>
+                </ng-container>
+                <ng-container matColumnDef="formulario">
+                  <th mat-header-cell *matHeaderCellDef> Auditoría </th>
+                  <td mat-cell *matCellDef="let row"> {{row.form}} </td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef> Editar </th>
+                  <td mat-cell *matCellDef="let row">
+                    <button mat-button data-toggle="modal" data-target="#example" style="margin-left:20px">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                      </svg>
+                    </button>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell" colspan="4">Escribe algo en la barra de busqueda</td>
+                </tr>
+              </table>
+              <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab" tabindex="0" style="background-color: transparent; color:black">
+      <div class="card mt-2">
+        <div class="card-header">
+          <p class="title">Calendario de auditorías</p>
+        </div>
+        <div class="card-body">
+          <div class="row" *ngIf="mostrar">
+            <div class="col-8" id="calendario" style="background-color: white; padding: 10px; border-radius: 10px;">
+              <full-calendar [options]="calendarOptions"></full-calendar>
+            </div>
+            <div class="col-4" id="infoRutina">
+              <div>
+                <p class="subtitle">Informacion del evento</p>
+                <p *ngIf="status == 'Pendiente'" style="background-color: #ffa806; color:white; padding:5px; border-radius: 5px;">Status: {{status}}</p>
+                <p *ngIf="status == 'Completado'" style="background-color: #a8e147; color:white; padding:5px; border-radius: 5px;">Status: {{status}}</p>
+                <p *ngIf="status == 'Retrasado'" style="background-color: #01051d; color:white; padding:5px; border-radius: 5px;">Status: {{status}}</p>
+                <p>Nombre: {{title}}</p>
+                <p>Descripción: {{description}}</p>
+                <p>Auditoría: {{form}}</p>
+                <p>Encargado: {{employee}}</p>
+                <p>Qr code:</p>
+                  <ngx-qrcode
+                    [elementType]="elementType"
+                    [value]="value"
+                    cssClass="aclass"
+                    [errorCorrectionLevel]="errorCorrectionLevel">
+                  </ngx-qrcode>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
