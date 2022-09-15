@@ -1,0 +1,56 @@
+.example-container {
+  width: 100%;
+  height: 100%;
+  background-image: url('../../../assets/img/bg.png');
+}
+
+.example-sidenav-content {
+  height: 100%;
+  justify-content: center;
+}
+
+.example-sidenav {
+  padding: 20px;
+  background-color: #E2231A;
+}
+
+.logo{
+  max-width: 200px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.textLogo{
+  color: white;
+  text-align: center;
+}
+
+.menuOption{
+  background-color: white;
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: left;
+}
+
+.menuOptionSelected{
+  background-color: #E2231A;
+  color: white;
+  border: 1px solid white;
+}
+
+.menuOption:hover{
+  background-color: #E2231A;
+  color: white;
+  border: 1px solid white;
+}
+
+.example-sidenav-content{
+  align-items: normal !important;
+}
+
+.toggleButton{
+  position: absolute;
+  top: 0;
+  left: 0;
+}

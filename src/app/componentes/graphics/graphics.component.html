@@ -1,0 +1,164 @@
+
+<div class="container">
+  <div class="row busqueda">
+    <div class="col">
+      <!-- Empleados -->
+      <p class="align-self-center textBusqueda">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Auditoría</mat-label>
+          <mat-select [(ngModel)]="filter.form" name="empleado" (ngModelChange)="checkForm()">
+            <mat-option *ngFor="let form of forms" [value]="form">
+              {{form.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </p>
+    </div>
+    <div class="col">
+      <!-- Empleados -->
+      <p class="align-self-center textBusqueda">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Año</mat-label>
+          <input type="number" min="1900" max="2099" step="1" value="2016" matInput [(ngModel)]="filter.year" name="year" (keyup)="checkForm()" required>
+        </mat-form-field>
+      </p>
+    </div>
+    <div class="col-2 align-self-center">
+      <div *ngIf="formReady">
+        <button class="btn btn-success" (click)="formSearch()">Buscar</button>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6" style="margin:0px auto">
+      <app-spinner></app-spinner>
+    </div>
+  </div>
+  <div class="row mt-4" *ngIf="listadoDeResultados && !mostrarDetallesDeResultados">
+    <div style="margin:0px auto; width: 90%;">
+      <h3>Listado de auditorías de {{filter.year}} para {{filter.form.name}}</h3>
+      <table class="table">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Detalles</th>
+            <th scope="col">Evento</th>
+            <th scope="col">Periodo</th>
+            <th scope="col">Responsable</th>
+          </tr>
+        </thead>
+        <tbody style="background-color:white">
+          <tr *ngFor="let resultado of listadoResultados; let i = index;">
+            <th scope="row">{{i+1}}</th>
+            <td>
+              <input type="checkbox" id="selected" (change)="agregarAFiltrado($event, resultado.id)"/>
+            </td>
+            <td>{{resultado.event.name}}</td>
+            <td>{{resultado.event.startDateTime}} - {{resultado.event.endDateTime}}</td>
+            <td>{{resultado.employee.firstName}} {{resultado.employee.lastName}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row" *ngIf="botonBuscarGraficos && !mostrarDetallesDeResultados">
+    <div style="margin:0px auto; width: 90%;">
+      <button (click)="preparacionDeGraficos()" class="btn btn-success" style="margin: 0px auto">Buscar</button>
+    </div>
+  </div>
+  <div class="row" *ngIf="mostrarDetallesDeResultados">
+
+
+
+
+
+
+
+    <div *ngIf="searchReady" class="mt-4">
+
+      <div class="row mb-4">
+        <div class="col" align="center">
+          <h3>Resultados del filtrado de {{filter.year}} para {{filter.form.name}}</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-11" align="center" style="background-color: white; margin:0px auto; padding: 10px; border-radius: 10px;">
+          <ngx-charts-bar-vertical-2d *ngIf="graphicReady"
+            [view]="view"
+            [scheme]="colorScheme"
+            [results]="multi"
+            [gradient]="gradient"
+            [xAxis]="showXAxis"
+            [yAxis]="showYAxis"
+            [legend]="showLegend"
+            [showXAxisLabel]="showXAxisLabel"
+            [showYAxisLabel]="showYAxisLabel"
+            [xAxisLabel]="xAxisLabel"
+            [yAxisLabel]="yAxisLabel"
+            [legendTitle]="legendTitle"
+            [roundDomains]="roundDomains"
+            [showDataLabel]="showDataLabel"
+            [legendPosition]="legendPosition"
+            [showGridLines]="showGridLines"
+            [noBarWhenZero]="noBarWhenZero"
+            (select)="onSelect($event)"
+            (activate)="onActivate($event)"
+            (deactivate)="onDeactivate($event)"
+            >
+          </ngx-charts-bar-vertical-2d>
+        </div>
+      </div><hr>
+      <div class="row">
+        <div class="col" align="center">
+          <div class="container p-5">
+            <div class="accordion accordion-flush" id="accordionFlushExample">
+                <div class="accordion-item" *ngFor="let comment of commentsArray; let i = index">
+                  <h2 class="accordion-header" [id]="'heading'+i">
+                    <button class="accordion-button" [ngClass]="{ 'collapsed': i != 0 }" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse'+i" aria-expanded="false" [attr.aria-controls]="'collapse'+i">
+                      {{i+1}}.- {{comment.question}}
+                    </button>
+                  </h2>
+                  <div [id]="'collapse'+i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading'+i" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body" align="left">
+                      <p *ngFor="let comentario of commentsArray[i].comments; let i = index">
+                        {{i+1}}.- {{comentario}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div><hr><!--
+      <div class="row mb-4">
+        <div class="col" align="center">
+          <h2>Comentarios generales: </h2>
+          <img src="../../../assets/img/Flowserve-Logo.jpg"  data-toggle="modal" data-target="#exampleModal" class="image">
+        </div>
+      </div> -->
+    </div>
+  </div>
+  <div *ngIf="!listadoDeResultados && filtradoFail">
+    <div class="row mt-4 mb-4">
+      <div class="col-10 alert alert-danger" style="margin: 0px auto">
+        No se encontraron resultados
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" data-backdrop="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img src="../../../assets/img/Flowserve-Logo.jpg" class="imageModal">
+      </div>
+    </div>
+  </div>
+</div>

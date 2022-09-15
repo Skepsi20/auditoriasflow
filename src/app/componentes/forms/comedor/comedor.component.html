@@ -1,0 +1,112 @@
+<div class="header">
+  SISTEMA DE AUDITORIAS FLOWSERVE TLAXCALA
+</div>
+<div class="container">
+  <div class="row">
+    <div class="card col-10 text-white mb-3" style="margin: 0px auto; text-align: center; background-color: #E2231A;">
+      <div class="card-header">
+        BEHAVIOR BASED SAFETY (BBS)
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">BBS COMEDOR</h5>
+        <p class="card-text">Auditado: RICARDO</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="card col-10 border-danger mb-3" style="min-height: 420px; margin: 0px auto;box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;">
+      <div class="card-header" style="width: 100%; text-align: center;">
+        <div *ngFor="let question of preguntas; let i = index" class="questionBox">
+          <div *ngIf="question.respuesta != undefined" class="btn" style="background-color: #E2231A; color:white" (click)="selectedQuestion = i">
+            {{i+1}}
+          </div>
+          <div *ngIf="question.respuesta == undefined" class="btn btn-light" (click)="selectedQuestion = i" style="border:1px solid gray">
+            {{i+1}}
+          </div>
+        </div>
+      </div>
+      <div class="card-body" style="padding-left: 0px !important; padding-right: 0px !important;">
+        <h5 class="card-title">
+          <div class="col-12 questionContainerBox" *ngFor="let question of preguntas; let i = index">
+            <div class="form-group" *ngIf="selectedQuestion == i">
+              <div class="row">
+                <div class="col" style="min-height: 70px;">
+                  <p class="pregunta">{{selectedQuestion+1}}. {{preguntas[i].pregunta}}</p>
+                </div>
+              </div>
+              <div class="row" *ngIf="selectedQuestion != preguntas.length-1">
+                <div class="col" align="right">
+                  <button (click)="functionYes(i)" *ngIf="question.respuesta == true" class="btn btn-success">Si</button>
+                  <button (click)="functionYes(i)" *ngIf="question.respuesta != true" class="btn btn-dark">Si</button>
+                </div>
+                <div class="col" align="left">
+                  <button (click)="functionNo(i)" *ngIf="question.respuesta == false" class="btn btn-success">No</button>
+                  <button (click)="functionNo(i)" *ngIf="question.respuesta != false" class="btn btn-dark">No</button>
+                </div>
+              </div>
+              <div class="row" *ngIf="selectedQuestion == preguntas.length-1">
+                <div class="col" align="center">
+                  <!--<input type="file" accept="image/*" (change)="captureFile($event)" [(ngModel)]="question.respuesta" capture="environment"> -->
+<!--                   <input type="file" (change)="captureFile($event)" [(ngModel)]="question.respuesta">-->
+                  <input type="file" accept="image/*" (change)="captureFile($event)" [(ngModel)]="question.respuesta" capture="environment">
+                </div>
+              </div>
+              <div class="row" *ngIf="previsualizacion && selectedQuestion == preguntas.length-1">
+                <div class="col">
+                  <img [src]="previsualizacion" class="fotografia">
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-10" style="margin: 0px auto;">
+                  <p class="pregunta">Comentarios</p>
+                  <textarea class="form-control" id="comentarios" rows="3" [(ngModel)]="question.comentarios" value="question.comentarios"
+                  style="box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;"></textarea>
+                </div>
+              </div>
+              <div class="row mt-4" *ngIf="selectedQuestion == preguntas.length-1">
+                <div class="col" align="center">
+                  <button *ngIf="selectedQuestion == preguntas.length-1 && respuestas.image == '' " (click)="functionReady()" class="btn btn-dark">
+                    Sin comentarios
+                  </button>
+                  <div *ngIf="selectedQuestion == preguntas.length-1 && respuestas.image != ''"  class="btn" style=" background-color: #E2231A; color:white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-check-lg" viewBox="0 0 16 16">
+                      <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </h5>
+      </div>
+      <div class="card-footer text-muted">
+        <div class="row">
+          <div class="col" align="right">
+            <button *ngIf="selectedQuestion>0" (click)="selectedQuestion = selectedQuestion-1" class="btn" style=" background-color: #E2231A;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="col" align="left">
+            <button *ngIf="selectedQuestion<preguntas.length-1" (click)="selectedQuestion = selectedQuestion+1" class="btn" style=" background-color: #E2231A;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+              </svg>
+            </button>
+            <button *ngIf="selectedQuestion == preguntas.length-1 && formReady" (click)="enviar()" class="btn" style=" background-color: #E2231A; color: white;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-check-lg" viewBox="0 0 16 16">
+                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+              </svg> Terminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4 mb-4">
+    <div class="col-10 alert alert-danger" style="margin: 0px auto">
+      SI ENCUENTRAS UN PELIGRO QUE TENGA UN RIESGO ALTO PARA EL EMPLEADO O UN RESULTADO NEGATIVO EN LA AUDITORÍA, DETEN LA ACTIVIDAD Y NOTIFICA AL SUPERVISOR INMEDIATAMENTE
+    </div>
+  </div>
+</div>
