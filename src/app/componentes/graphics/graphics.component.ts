@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { ChartOptions, ChartType } from 'chart.js';
 import { FormsService } from 'src/app/services/form/forms.service';
 import { SpinnerService } from 'src/app/services/spinner/spinner.service';
 
@@ -56,6 +57,42 @@ export class GraphicsComponent implements OnInit {
   searchReady = false;
   arregloDeEventos: Array<any> = [];
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  public barChartOptions: ChartOptions = {
+    responsive: true
+  };
+  public barChartType: ChartType = 'bar';
+  public barChartLegend = true;
+
+  public barChartData: any[] = [
+    { data: [1, 2, 3], label: 'Approved', type: 'line' },
+    { data: [1, 2, 3], label: 'Accepted', stack: 'a' },
+    { data: [1, 2, 3], label: 'Open', stack: 'a' },
+    { data: [1, 2, 3], label: 'In Progress', stack: 'a' },
+  ];
+  public barChartLabels: string[] = ['P', 'R', 'B'];
+
+
   constructor(
     private formsService: FormsService,
     private spinnerService: SpinnerService
@@ -93,6 +130,7 @@ export class GraphicsComponent implements OnInit {
     this.formsService.getFormByYear(request)
     .subscribe(
       (success)=>{
+        console.log(success)
         this.spinnerService.hide();
         if(!success.length){
           this.filtradoFail = true;
@@ -133,13 +171,13 @@ export class GraphicsComponent implements OnInit {
     this.formsService.getFormByYearandFiltered(request)
     .subscribe(
       (success)=>{
+        console.log(success)
+
         for (let index = 0; index < success.length; index++) {
-          console.log(success)
           this.commentsArray[index] = {
             question: success[index].questionDescription,
             comments: success[index].comments
           }
-
           this.multi[index] = {
             "name": "Pregunta "+(index+1),
             "series": [
@@ -154,19 +192,11 @@ export class GraphicsComponent implements OnInit {
             ]
           }
         }
-
         this.graphicReady = true;
-        console.log(this.multi)
-        console.log(this.commentsArray)
-
-
-
-
       },(error)=>{
         console.log(error)
       }
     )
-
     this.mostrarDetallesDeResultados = true
   }
 
@@ -181,6 +211,48 @@ export class GraphicsComponent implements OnInit {
 
   onDeactivate(data:any): void {
     //console.log('Deactivate', JSON.parse(JSON.stringify(data)));
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  // events
+  public chartClicked({ event, active }: { event: MouseEvent, active: {}[] }): void {
+    console.log(event, active);
+  }
+
+  public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
+    console.log(event, active);
+  }
+
+
+  public randomize(): void {
+    // Only Change 3 values
+    const data = [
+      Math.round(Math.random() * 100),
+      59,
+      80,
+      (Math.random() * 100),
+      56,
+      (Math.random() * 100),
+      40];
+    const clone = JSON.parse(JSON.stringify(this.barChartData));
+    clone[0].data = data;
+    this.barChartData = clone;
+    /**
+     * (My guess), for Angular to recognize the change in the dataset
+     * it has to change the dataset variable directly,
+     * so one way around it, is to clone the data, change it and then
+     * assign it;
+     */
   }
 
 }

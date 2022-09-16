@@ -78,6 +78,9 @@ import { AuthComponent } from './componentes/auth/auth.component';
 import { JwtInterceptorInterceptor } from './componentes/auth/jwt-interceptor.interceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
+import { LoginComponent } from './componentes/auth/login/login.component';
+
+import { NgChartsModule } from 'ng2-charts';
 
 FullCalendarModule.registerPlugins([ // register FullCalendar plugins
   dayGridPlugin,
@@ -107,6 +110,7 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     EmpleadosComponent,
     AuthComponent,
     SpinnerComponent,
+    LoginComponent,
 
 
   ],
@@ -154,7 +158,8 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     HttpClientModule,
     NgxChartsModule,
     FullCalendarModule,
-    NgxQRCodeModule
+    NgxQRCodeModule,
+    NgChartsModule
   ],
   providers: [
     CookieService,

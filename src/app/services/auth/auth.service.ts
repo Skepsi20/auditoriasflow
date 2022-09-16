@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { employee } from 'src/app/models/employee.model';
+import { credentials } from 'src/app/models/credentials.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,14 @@ export class AuthService {
   constructor(
     private httpClient: HttpClient
   ){}
+
+  login(credentialsRequest: credentials): Observable<any>{
+    const credentials: credentials={
+      userName: credentialsRequest.userName,
+      password: credentialsRequest.password
+    };
+    return this.httpClient.post<credentials>(this.baseApiUrl+'/api/authentication/login/',credentials);
+  }
 
   refreshToken(request: any): Observable<any>{
     const refreshTokenRequest: any={

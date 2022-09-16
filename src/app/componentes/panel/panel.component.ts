@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'panel',
@@ -7,10 +9,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PanelComponent implements OnInit {
   opcionMenu:any;
+  public cookieUser : string = '';
 
-  constructor() { }
+  constructor(
+        private cookieService : CookieService,
+        private router: Router,
+  ) { }
 
   ngOnInit(): void {
+    this.cookieUser = this.cookieService.get('accessToken');
+    if(!this.cookieUser){
+      this.router.navigate(['']);
+    }
     if(localStorage.getItem('vista')){
       this.opcionMenu = localStorage.getItem('vista');
       if(this.opcionMenu == 'calendario'){
@@ -22,6 +32,12 @@ export class PanelComponent implements OnInit {
   seleccionMenu(vista:string){
     localStorage.setItem('vista', vista);
     this.opcionMenu = vista;
+  }
+
+  logOut(){
+    console.log("log out")
+    this.cookieService.delete('accessToken');
+    this.ngOnInit();
   }
 
 }

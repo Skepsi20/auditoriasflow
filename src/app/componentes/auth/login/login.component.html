@@ -1,0 +1,40 @@
+<app-spinner></app-spinner>
+<div class="container">
+  <form #studentDetailsForm="ngForm">
+    <div class="card text-center mt-4">
+      <div class="card-header" style="background-color: #E2231A; color:white">
+        <h4>SISTEMA DE AUDITORIAS BBS</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Correo electrónico</mat-label>
+              <input type="email" matInput [(ngModel)]="credential.userName" name="userName" required>
+              <mat-error>El campo email es requerido</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Contraseña</mat-label>
+              <input matInput [type]="hide ? 'password' : 'text'" [(ngModel)]="credential.password" name="password" required>
+              <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+              <mat-error *ngIf="credential.password">Contraseña requerida</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-muted">
+        <div class="row">
+          <div class="col">
+            <button class="botonLogin" (click)="login()">Ingresar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

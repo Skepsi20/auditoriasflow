@@ -40,9 +40,8 @@
 }
 
 .menuOption:hover{
-  background-color: #E2231A;
+  background-color: #94140e;
   color: white;
-  border: 1px solid white;
 }
 
 .example-sidenav-content{
@@ -53,4 +52,9 @@
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.nav-link:hover{
+  cursor: pointer;
+  background-color: #94140e;
 }
