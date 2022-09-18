@@ -1,180 +1,80 @@
-import { Component, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { answer, answerDetail } from 'src/app/models/answer.model';
-import { AnswerService } from 'src/app/services/answers/answer.service';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'almacen',
   templateUrl: './almacen.component.html',
-  styleUrls: ['./almacen.component.css']
+  styleUrls: ['./almacen.component.css'],
 })
-export class AlmacenComponent implements OnInit {
+export class AlmacenComponent implements OnInit{
+  chart:any;
 
-  public preguntas: Array<any> = [
-    {
-      pregunta: 'El operador está usando correctamente y completo su EPP (lentes, tapones y botas)',
-      respuesta: undefined,
-      comentarios: ''
-    },
-    {
-      pregunta: 'Solicite al operador si puede bajar un material de una estiba alta y valide si al hacerlo usa el barandal de la escalera',
-      respuesta: undefined,
-      comentarios: ''
-    },
-    {
-      pregunta: 'Revise si la escalera está en buenas condiciones (gomas de las patas, barandales, escalones)',
-      respuesta: undefined,
-      comentarios: ''
-    },
-    {
-      pregunta: 'Observe si cuando mueven una carga pesada utilizan un carro transportador de apoyo',
-      respuesta: undefined,
-      comentarios: ''
-    },
-    {
-      pregunta: 'Revise si el carro transportador tiene frenos en las ruedas y está siendo utilizado',
-      respuesta: undefined,
-      comentarios: ''
-    },
-    {
-      pregunta: 'Describa algun comportamiento de riesgo que haya observado',
-      respuesta: undefined,
-      comentarios: ''
-    }
-  ]
-
-  public respuestas: answer = {
-    eventId: '',
-    assignedTo: '',
-    image: '',
-    questions: [{
-      description: '',
-      selection: false,
-      comments: ''
-    }]
-  }
-  public answersArray: Array<answerDetail> = [];
-
-  public selectedQuestion = 0;
-  public formReady = false;
-  public archivos: any = [];
-  public previsualizacion: string = '';
-
-  constructor(
-    private sanitizer: DomSanitizer,
-    private answerService: AnswerService
-    ) { }
+  constructor() {}
 
   ngOnInit(): void {
+    this.chart = document.getElementById('my_first_chart');
+    Chart.register(...registerables);
+    this.loadChart();
   }
 
-  functionReady(){
-    this.preguntas[this.preguntas.length-1].respuesta = true;
-    this.respuestas.image = 'No image';
+  loadChart(){
+    new Chart(this.chart,{
+      type:'line',
 
-    var answered = 0;
-    for (let i = 0; i < this.preguntas.length-1; i++) {
-      if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
-        answered ++;
-      }if(answered == 0){
-        this.formReady = true;
-      }
-    }
 
-  }
-
-  functionYes(index:any){
-    this.preguntas[index].respuesta = true;
-    var answered = 0;
-    for (let i = 0; i < this.preguntas.length-1; i++) {
-      if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
-        answered ++;
-      }if(answered == 0){
-        this.formReady = true;
-      }
-    }
-  }
-
-  functionNo(index:any){
-    this.preguntas[index].respuesta = false;
-    var answered = 0;
-    for (let i = 0; i < this.preguntas.length-1; i++) {
-      if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
-        answered ++;
-      }if(answered == 0){
-        this.formReady = true;
-      }
-    }
-  }
-
-  captureFile(event:any):any{
-    const archivoCapturado = event.target.files[0]
-    this.extraerBase64(archivoCapturado).then((imagen:any) => {
-      this.respuestas.image = imagen.base;
-      this.previsualizacion = imagen.base;
-      console.log(this.previsualizacion)
-      this.preguntas[this.preguntas.length-1].respuesta = true;
-      var answered = 0;
-      for (let i = 0; i < this.preguntas.length-1; i++) {
-        if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
-          answered ++;
-        }if(answered == 0){
-          this.formReady = true;
+      data:{
+        labels: [
+          'Pregunta 2',
+          'Pregunta 4',
+          'Pregunta 1',
+          'Pregunta 3'
+        ],
+        datasets:[{
+          type: 'bar',
+          label: 'Cantidad de No',
+          data: [5, 4, 2, 1],
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgb(255, 99, 132)',
+          yAxisID: 'y'
+        },{
+          type: 'line',
+          label: 'Porcentaje',
+          data: [41, 74, 90, 100],
+          tension:0.2,
+          borderColor: 'rgb(54, 162, 235)',
+          yAxisID: 'percentage'
+        }]
+      },
+      options:{
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            type:'linear',
+            position:'left',
+            max: 12
+          },
+          percentage: {
+            beginAtZero: true,
+            type:'linear',
+            position:'right',
+            grid: {
+              drawOnChartArea: false
+            },
+            ticks:{
+              callback: function(value, index, values){
+                return `${value} %`
+              }
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false
+            }
+          }
         }
       }
     })
-    this.archivos.push(archivoCapturado);
-  }
-
-  extraerBase64 = async ($event: any) => new Promise((resolve) => {
-  try{
-    const unsafeImg = window.URL.createObjectURL($event);
-    const image = this.sanitizer.bypassSecurityTrustUrl(unsafeImg);
-    const reader = new FileReader();
-    reader.readAsDataURL($event);
-      reader.onload = () =>{
-        resolve({
-          base: reader.result
-        });
-      };
-      reader.onerror = error =>{
-        resolve({
-          base: null
-        });
-      };
-      return
-    }catch (e) {
-      return null;
-    }
-  })
-
-  enviar(){
-    for(let i = 0; i<this.preguntas.length-1; i++){
-      this.answersArray.push(
-        {
-          description: this.preguntas[i].pregunta,
-          selection: this.preguntas[i].respuesta,
-          comments: this.preguntas[i].comentarios,
-        });
-    }
-    const answers = {
-      eventId: '08da947b-dcab-451d-82bc-0e74790f0e9f',
-      assignedTo: '08da9463-7481-4123-844d-967dc42fafcb',
-      image: this.respuestas.image,
-      questions: this.answersArray
-    }
-    console.log(answers)
-
-    this.answerService.addAnswer(answers)
-      .subscribe(
-        (success)=>{
-          console.log(success)
-          console.log('FUNCIONOOOO')
-        },(error)=>{
-          console.log(error)
-        }
-      )
-
-    console.log("RESPUESTAS", this.preguntas)
   }
 }

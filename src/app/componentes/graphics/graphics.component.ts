@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
-import { ChartOptions, ChartType } from 'chart.js';
 import { FormsService } from 'src/app/services/form/forms.service';
 import { SpinnerService } from 'src/app/services/spinner/spinner.service';
+import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'graphics',
@@ -18,80 +18,21 @@ export class GraphicsComponent implements OnInit {
       id: ''
     },
   }
-  multi = [{ }];
 
-  view: any = [700, 400];
-
-  // options
-  showXAxis: boolean = true;
-  showYAxis: boolean = true;
-  gradient: boolean = false;
-  showLegend: boolean = true;
-  roundDomains: boolean = true;
-  showXAxisLabel: boolean = true;
-  showDataLabel: boolean = false;
-  noBarWhenZero: boolean = false;
-  showGridLines: boolean = true;
-  graphicReady: boolean = false;
-  legendPosition: any = ['string'];
-  xAxisLabel: string = 'Pregunta';
-  showYAxisLabel: boolean = true;
-  yAxisLabel: string = 'Respuesta';
-  legendTitle: string = 'Opciones';
   listadoDeResultados: boolean = false;
   filtradoFail = false;
   mostrarDetallesDeResultados = false;
   botonBuscarGraficos = false;
   listadoResultados: Array<any> = [];
   filtradoParaGraficos: Array<any> = [];
-  commentsArray: Array<any> = [];
-
-  colorScheme: Color = {
-    name: 'myScheme',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#8ddf00', '#ff0c0c'],
-  };
+  commentsArray:Array<any> = [];
   formReady = false;
   forms: Array<any> = [];
   searchReady = false;
   arregloDeEventos: Array<any> = [];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  public barChartOptions: ChartOptions = {
-    responsive: true
-  };
-  public barChartType: ChartType = 'bar';
-  public barChartLegend = true;
-
-  public barChartData: any[] = [
-    { data: [1, 2, 3], label: 'Approved', type: 'line' },
-    { data: [1, 2, 3], label: 'Accepted', stack: 'a' },
-    { data: [1, 2, 3], label: 'Open', stack: 'a' },
-    { data: [1, 2, 3], label: 'In Progress', stack: 'a' },
-  ];
-  public barChartLabels: string[] = ['P', 'R', 'B'];
-
+  // Charts
+  chart:any;
 
   constructor(
     private formsService: FormsService,
@@ -130,7 +71,6 @@ export class GraphicsComponent implements OnInit {
     this.formsService.getFormByYear(request)
     .subscribe(
       (success)=>{
-        console.log(success)
         this.spinnerService.hide();
         if(!success.length){
           this.filtradoFail = true;
@@ -171,88 +111,96 @@ export class GraphicsComponent implements OnInit {
     this.formsService.getFormByYearandFiltered(request)
     .subscribe(
       (success)=>{
-        console.log(success)
-
-        for (let index = 0; index < success.length; index++) {
+        console.table(success)
+        var arregloDatos = success;
+        var arregloPreguntas = [];
+        var arregloPorcentaje = [];
+        var arregloComentarios = []
+        var arregloNo = [];
+        var total = 0;
+        var porcentaje = 0;
+        arregloDatos.sort(((a, b) => b.negativeCounter - a.negativeCounter))
+        for (let index = 0; index < arregloDatos.length; index++) {
+          console.log(arregloDatos[index])
+          total = arregloDatos[index].negativeCounter + total;
+          arregloPreguntas.push(arregloDatos[index].questionDescription)
+          arregloNo.push(arregloDatos[index].negativeCounter)
+          for (let j = 0; j < arregloDatos[index].details.length; j++) {
+            arregloComentarios[j] = (arregloDatos[index].details[j].employee.firstName +' '+ arregloDatos[index].details[j].employee.lastName +': '+ arregloDatos[index].details[j].comments + ' / ' + arregloDatos[index].details[j].event.name)
+          }
           this.commentsArray[index] = {
-            question: success[index].questionDescription,
-            comments: success[index].comments
+            question: arregloDatos[index].questionDescription,
+            respuestas: arregloComentarios
           }
-          this.multi[index] = {
-            "name": "Pregunta "+(index+1),
-            "series": [
-              {
-                "name": "Si",
-                "value": success[index].positiveCounter
-              },
-              {
-                "name": "No",
-                "value": success[index].negativeCounter
-              }
-            ]
-          }
+          arregloComentarios = [];
         }
-        this.graphicReady = true;
+        for (let index = 0; index < arregloDatos.length; index++) {
+          porcentaje = ((arregloDatos[index].negativeCounter/total)+ porcentaje);
+          arregloPorcentaje.push(porcentaje*100)
+        }
+        console.log(arregloPorcentaje)
+        this.chart = document.getElementById('my_first_chart');
+        Chart.register(...registerables);
+
+        new Chart(this.chart,{
+          type:'line',
+          data:{
+            labels: arregloPreguntas,
+            datasets:[{
+              type: 'bar',
+              label: 'Cantidad de incidencias',
+              data: arregloNo,
+              backgroundColor: 'rgba(226, 35, 26, 0.5)',
+              borderColor: 'rgb(226, 35, 26)',
+              borderRadius: 5,
+              yAxisID: 'y'
+            },{
+              type: 'line',
+              label: 'Porcentaje',
+              data: arregloPorcentaje,
+              tension:0.2,
+              borderColor: 'rgb(45,75,122)',
+              yAxisID: 'percentage'
+            }]
+          },
+          options:{
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                type:'linear',
+                position:'left',
+                max: total
+              },
+              percentage: {
+                beginAtZero: true,
+                type:'linear',
+                position:'right',
+                grid: {
+                  drawOnChartArea: false
+                },
+                ticks:{
+                  callback: function(value, index, values){
+                    return `${value} %`
+                  }
+                }
+              },x: {
+                ticks: {
+                    display: false
+                },
+                grid: {
+                  drawBorder: false
+                }
+            }
+            }
+          }
+        })
       },(error)=>{
         console.log(error)
       }
     )
     this.mostrarDetallesDeResultados = true
-  }
-
-
-  onSelect(data:any): void {
-    //console.log('Item clicked', JSON.parse(JSON.stringify(data)));
-  }
-
-  onActivate(data:any): void {
-    //console.log('Activate', JSON.parse(JSON.stringify(data)));
-  }
-
-  onDeactivate(data:any): void {
-    //console.log('Deactivate', JSON.parse(JSON.stringify(data)));
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-  // events
-  public chartClicked({ event, active }: { event: MouseEvent, active: {}[] }): void {
-    console.log(event, active);
-  }
-
-  public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
-    console.log(event, active);
-  }
-
-
-  public randomize(): void {
-    // Only Change 3 values
-    const data = [
-      Math.round(Math.random() * 100),
-      59,
-      80,
-      (Math.random() * 100),
-      56,
-      (Math.random() * 100),
-      40];
-    const clone = JSON.parse(JSON.stringify(this.barChartData));
-    clone[0].data = data;
-    this.barChartData = clone;
-    /**
-     * (My guess), for Angular to recognize the change in the dataset
-     * it has to change the dataset variable directly,
-     * so one way around it, is to clone the data, change it and then
-     * assign it;
-     */
   }
 
 }

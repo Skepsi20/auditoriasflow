@@ -691,7 +691,8 @@ export class StampingComponent implements OnInit {
 
   enviar(){
     this.spinnerService.show();
-    for(let i = 0; i<this.preguntas.length-1; i++){
+    debugger
+    for(let i = 0; i<this.preguntas.length; i++){
       this.answersArray.push(
         {
           description: this.preguntas[i].pregunta,
@@ -699,6 +700,7 @@ export class StampingComponent implements OnInit {
           comments: this.preguntas[i].comentarios,
         });
     }
+
     const answers = {
       eventId: this.eventId,
       assignedTo: this.userId,
@@ -706,8 +708,7 @@ export class StampingComponent implements OnInit {
       image: this.respuestas.image,
       questions: this.answersArray
     }
-    console.log(answers)
-
+    console.log(this.answersArray)
     this.answerService.addAnswer(answers)
       .subscribe(
         (success)=>{
@@ -718,7 +719,6 @@ export class StampingComponent implements OnInit {
           console.log(error)
         }
       )
-
     console.log("RESPUESTAS", this.preguntas)
   }
 }

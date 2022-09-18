@@ -67,15 +67,7 @@
     </div>
   </div>
   <div class="row" *ngIf="mostrarDetallesDeResultados">
-
-
-
-
-
-
-
     <div *ngIf="searchReady" class="mt-4">
-
       <div class="row mb-4">
         <div class="col" align="center">
           <h3>Resultados del filtrado de {{filter.year}} para {{filter.form.name}}</h3>
@@ -83,29 +75,7 @@
       </div>
       <div class="row">
         <div class="col-11" align="center" style="background-color: white; margin:0px auto; padding: 10px; border-radius: 10px;">
-          <ngx-charts-bar-vertical-2d *ngIf="graphicReady"
-            [view]="view"
-            [scheme]="colorScheme"
-            [results]="multi"
-            [gradient]="gradient"
-            [xAxis]="showXAxis"
-            [yAxis]="showYAxis"
-            [legend]="showLegend"
-            [showXAxisLabel]="showXAxisLabel"
-            [showYAxisLabel]="showYAxisLabel"
-            [xAxisLabel]="xAxisLabel"
-            [yAxisLabel]="yAxisLabel"
-            [legendTitle]="legendTitle"
-            [roundDomains]="roundDomains"
-            [showDataLabel]="showDataLabel"
-            [legendPosition]="legendPosition"
-            [showGridLines]="showGridLines"
-            [noBarWhenZero]="noBarWhenZero"
-            (select)="onSelect($event)"
-            (activate)="onActivate($event)"
-            (deactivate)="onDeactivate($event)"
-            >
-          </ngx-charts-bar-vertical-2d>
+          <canvas id="my_first_chart" style="width: 80%; margin: 0px auto;"></canvas>
         </div>
       </div><hr>
       <div class="row">
@@ -115,13 +85,13 @@
                 <div class="accordion-item" *ngFor="let comment of commentsArray; let i = index">
                   <h2 class="accordion-header" [id]="'heading'+i">
                     <button class="accordion-button" [ngClass]="{ 'collapsed': i != 0 }" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse'+i" aria-expanded="false" [attr.aria-controls]="'collapse'+i">
-                      {{i+1}}.- {{comment.question}}
+                        {{comment.question}}
                     </button>
                   </h2>
                   <div [id]="'collapse'+i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading'+i" data-bs-parent="#accordionFlushExample">
                     <div class="accordion-body" align="left">
-                      <p *ngFor="let comentario of commentsArray[i].comments; let i = index">
-                        {{i+1}}.- {{comentario}}
+                      <p *ngFor="let comentario of commentsArray[i].respuestas; let j = index">
+                        {{comentario}}
                       </p>
                     </div>
                   </div>
@@ -130,31 +100,13 @@
             </div>
         </div>
       </div><hr>
-      ESPACIO PARA IMAGEN :)
-
+      ESPACIO PARA IMAGEN
       <div class="row mb-4">
         <div class="col" align="center">
           <h2>Comentarios generales: </h2>
           <img src="../../../assets/img/Flowserve-Logo.jpg"  data-toggle="modal" data-target="#exampleModal" class="image">
         </div>
       </div>
-
-
-<!--
-      <div class="row mb-5">
-        <div class="col-md-12">
-          <div style="display: block">
-            <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
-              [legend]="barChartLegend" [chartType]="barChartType" (chartHover)="chartHovered($event)"
-              (chartClick)="chartClicked($event)"></canvas>
-          </div>
-          <button mat-button (click)="randomize()">Update</button>
-        </div>
-      </div>
-      -->
-
-
-
     </div>
   </div>
   <div *ngIf="!listadoDeResultados && filtradoFail">

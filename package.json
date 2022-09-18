@@ -28,7 +28,6 @@
     "@types/d3-scale": "^4.0.2",
     "chart.js": "^3.9.1",
     "jwt-decode": "^3.1.2",
-    "ng2-charts": "^4.0.0",
     "ngx-cookie-service": "^14.0.1",
     "ngx-qrcode2": "^9.0.0",
     "rxjs": "~6.6.0",

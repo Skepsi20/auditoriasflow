@@ -67,7 +67,6 @@ import { SoldaduraComponent } from './componentes/forms/soldadura/soldadura.comp
 import { EnsambleP72Component } from './componentes/forms/ensamble-p72/ensamble-p72.component';
 import { EnsambleP62Component } from './componentes/forms/ensamble-p62/ensamble-p62.component';
 import { GraphicsComponent } from './componentes/graphics/graphics.component';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -79,8 +78,6 @@ import { JwtInterceptorInterceptor } from './componentes/auth/jwt-interceptor.in
 import { CookieService } from 'ngx-cookie-service';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
 import { LoginComponent } from './componentes/auth/login/login.component';
-
-import { NgChartsModule } from 'ng2-charts';
 
 FullCalendarModule.registerPlugins([ // register FullCalendar plugins
   dayGridPlugin,
@@ -111,8 +108,6 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     AuthComponent,
     SpinnerComponent,
     LoginComponent,
-
-
   ],
   imports: [
     BrowserModule,
@@ -156,10 +151,9 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     MatTableModule,
     FormsModule,
     HttpClientModule,
-    NgxChartsModule,
     FullCalendarModule,
-    NgxQRCodeModule,
-    NgChartsModule
+    NgxQRCodeModule
+
   ],
   providers: [
     CookieService,
