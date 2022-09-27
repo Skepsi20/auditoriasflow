@@ -66,7 +66,7 @@
       <button (click)="preparacionDeGraficos()" class="btn btn-success" style="margin: 0px auto">Buscar</button>
     </div>
   </div>
-  <div class="row" *ngIf="mostrarDetallesDeResultados">
+  <div class="row" *ngIf="mostrarDetallesDeResultados && graficsReady">
     <div *ngIf="searchReady" class="mt-4">
       <div class="row mb-4">
         <div class="col" align="center">
@@ -75,24 +75,32 @@
       </div>
       <div class="row">
         <div class="col-11" align="center" style="background-color: white; margin:0px auto; padding: 10px; border-radius: 10px;">
+          <canvas id="barChart" style="width: 80%; margin: 0px auto;"></canvas>
+        </div>
+      </div><hr>
+      <div class="row">
+        <div class="col-11" align="center" style="background-color: white; margin:0px auto; padding: 10px; border-radius: 10px;">
           <canvas id="my_first_chart" style="width: 80%; margin: 0px auto;"></canvas>
         </div>
       </div><hr>
       <div class="row">
         <div class="col" align="center">
+          <h3>Listado de preguntas</h3>
           <div class="container p-5">
             <div class="accordion accordion-flush" id="accordionFlushExample">
                 <div class="accordion-item" *ngFor="let comment of commentsArray; let i = index">
                   <h2 class="accordion-header" [id]="'heading'+i">
                     <button class="accordion-button" [ngClass]="{ 'collapsed': i != 0 }" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse'+i" aria-expanded="false" [attr.aria-controls]="'collapse'+i">
-                        {{comment.question}}
+                        {{i+1}}.- {{comment.question}}
                     </button>
                   </h2>
                   <div [id]="'collapse'+i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading'+i" data-bs-parent="#accordionFlushExample">
                     <div class="accordion-body" align="left">
-                      <p *ngFor="let comentario of commentsArray[i].respuestas; let j = index">
-                        {{comentario}}
-                      </p>
+                        <div *ngFor="let comentario of commentsArray[i].respuestas; let j = index" >
+                          <p *ngIf="comentario">
+                            {{comentario}}
+                          </p>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -100,35 +108,37 @@
             </div>
         </div>
       </div><hr>
-      ESPACIO PARA IMAGEN
       <div class="row mb-4">
         <div class="col" align="center">
-          <h2>Comentarios generales: </h2>
-          <img src="../../../assets/img/Flowserve-Logo.jpg"  data-toggle="modal" data-target="#exampleModal" class="image">
+          <h2>Situaciones de riesgo: </h2>
+          <div *ngFor="let image of arregloImagenes">
+            <div class="col-4" style="float:left">
+              <div class="card text-center" align="center" style="height: 550px; margin-bottom: 30px; ">
+                <div class="card-header">
+                  {{image.employee}}: {{image.form}}
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <img [src]="image.image" class="image" style="width: 90%; height: 350px; margin: 0px auto;">
+                  </div>
+                  <div class="row" style="text-align:center; margin-top:10px;">
+                    <p>{{image.comments}}</p>
+                  </div>
+                </div>
+                <div class="card-footer text-muted">
+                  Fecha: {{image.period}}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </div>      
     </div>
   </div>
   <div *ngIf="!listadoDeResultados && filtradoFail">
     <div class="row mt-4 mb-4">
       <div class="col-10 alert alert-danger" style="margin: 0px auto">
         No se encontraron resultados
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" data-backdrop="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <img src="../../../assets/img/Flowserve-Logo.jpg" class="imageModal">
       </div>
     </div>
   </div>

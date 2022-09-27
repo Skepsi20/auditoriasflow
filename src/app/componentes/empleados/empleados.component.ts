@@ -14,6 +14,7 @@ import { MatTableDataSource } from '@angular/material/table';
 })
 export class EmpleadosComponent implements OnInit, AfterViewInit {
   @ViewChild('employeeForm') employeeForm?: NgForm;
+  @ViewChild('adminForm') adminForm?: NgForm;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -21,10 +22,28 @@ export class EmpleadosComponent implements OnInit, AfterViewInit {
   displayedColumns = ['nombre','matricula','opciones'];
   employees: Array<employee> = [];
   employeeArray: Array<any> = [];
-  dataSource: MatTableDataSource<any>;
+  dataSource!: MatTableDataSource<any>;
+
   menuOption = 'uno';
+  hide = true;  
+  userToUpdate = '';
+  userToDelete = '';
+
+  admin:any = {
+    firstName:'',
+    lastName:'',
+    email:'',
+    password:'',
+    phoneNumber:''
+  }
 
   empleado: employee = {
+    firstName: '',
+    lastName: '',
+    officialId: ''
+  }
+
+  updateEmpleado: employee = {
     firstName: '',
     lastName: '',
     officialId: ''
@@ -41,12 +60,12 @@ export class EmpleadosComponent implements OnInit, AfterViewInit {
         for (let i = 0; i < this.employees.length; i++) {
           this.employeeArray.push(createNewUser(successResponse[i]));
         }
+        this.dataSource = new MatTableDataSource(this.employeeArray);
       },
       (error) =>{
         console.log(error);
       }
     );
-    this.dataSource = new MatTableDataSource(this.employeeArray);
   }
 
   ngOnInit(): void {
@@ -73,6 +92,16 @@ export class EmpleadosComponent implements OnInit, AfterViewInit {
   checkForm(){
     if(this.empleado.firstName != '' && this.empleado.lastName != '' && this.empleado.officialId != ''){
       this.formReady = true;
+    }else{
+      this.formReady = false;
+    }
+  }
+
+  checkAdminForm(){
+    if(this.admin.firstName != '' && this.admin.lastName != '' && this.admin.email != '' && this.admin.password != '' && this.admin.phoneNumber != ''){
+      this.formReady = true;
+    }else{
+      this.formReady = false;
     }
   }
 
@@ -92,13 +121,97 @@ export class EmpleadosComponent implements OnInit, AfterViewInit {
           window.location.reload();
         },
         (error)=>{
-          this.snackbar.open('Error creando al empleado correctamente',undefined,{
+          this.snackbar.open('Error creando al empleado',undefined,{
             duration: 2000
           });
           console.log(error)
         }
       )
     }
+  }
+
+  addAdmin(){
+  if(this.admin.firstName != '' && this.admin.lastName != '' && this.admin.email != '' && this.admin.password != '' && this.admin.phoneNumber != ''){
+      this.formReady = true;
+    }else{
+      this.formReady = false;
+    }
+    if(this.formReady){
+      this.employeService.addAdmin(this.admin)
+      .subscribe(
+        (success)=>{
+          this.snackbar.open('Se creó el administrador correctamente',undefined,{
+            duration: 2000
+          });
+          var tiempos = setTimeout(()=>{
+            window.location.reload();
+          },2000);
+        },
+        (error)=>{
+          this.snackbar.open('Error creando al administrador',undefined,{
+            duration: 2000
+          });
+          console.log(error)
+        }
+      )
+    }
+  }
+
+  employeeToUpdate(id:any){
+    this.userToUpdate = id;
+    this.employeService.getEmployee(id)
+    .subscribe(
+      (success)=>{
+        console.log(success)
+        this.updateEmpleado.firstName = success.firstName,
+        this.updateEmpleado.lastName = success.lastName,
+        this.updateEmpleado.officialId = success.officialId        
+      },(error)=>{
+        console.log(error)
+      }
+    )
+  }
+
+  updateEmployee(){
+    this.employeService.updateEmployee(this.userToUpdate, this.updateEmpleado)
+    .subscribe(
+      (success)=>{
+        this.snackbar.open('Se actualizó el usuario correctamente',undefined,{
+          duration: 2000
+        });
+          var tiempos = setTimeout(()=>{
+            window.location.reload();
+          },2000);      
+        },(error)=>{
+        this.snackbar.open('Error actualizando al usuario',undefined,{
+          duration: 2000
+        });
+        console.log(error)
+      }
+    )
+  }
+
+  employeeToDelete(id:any){
+    this.userToDelete = id;
+  }
+
+  deleteEmployee(){
+    this.employeService.deleteEmployee(this.userToDelete)
+    .subscribe(
+      (success)=>{
+        this.snackbar.open('Se eliminó el usuario correctamente',undefined,{
+          duration: 2000
+        });
+          var tiempos = setTimeout(()=>{
+            window.location.reload();
+          },2000);      
+        },(error)=>{
+        this.snackbar.open('Error eliminando al usuario',undefined,{
+          duration: 2000
+        });
+        console.log(error)
+      }
+    )
   }
 
 }

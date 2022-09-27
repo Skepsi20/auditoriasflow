@@ -471,7 +471,6 @@ export class StampingComponent implements OnInit {
     }
   ]
 
-
   /* SECCION DE PREGUNTAS FIN */
 
   public respuestas: answer = {
@@ -612,20 +611,19 @@ export class StampingComponent implements OnInit {
     this.respuestas.image = 'No image';
 
     var answered = 0;
-    for (let i = 0; i < this.preguntas.length-1; i++) {
+    for (let i = 0; i < this.preguntas.length; i++) {
       if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
         answered ++;
       }if(answered == 0){
         this.formReady = true;
       }
     }
-
   }
 
   functionYes(index:any){
     this.preguntas[index].respuesta = true;
     var answered = 0;
-    for (let i = 0; i < this.preguntas.length-1; i++) {
+    for (let i = 0; i < this.preguntas.length; i++) {
       if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
         answered ++;
       }if(answered == 0){
@@ -637,7 +635,7 @@ export class StampingComponent implements OnInit {
   functionNo(index:any){
     this.preguntas[index].respuesta = false;
     var answered = 0;
-    for (let i = 0; i < this.preguntas.length-1; i++) {
+    for (let i = 0; i < this.preguntas.length; i++) {
       if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
         answered ++;
       }if(answered == 0){

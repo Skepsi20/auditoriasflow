@@ -20,13 +20,14 @@ import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiedi
 })
 export class AgendaComponent implements OnInit {
   @ViewChild('eventForm') eventForm?: NgForm;
+  @ViewChild('eventUpdateForm') eventUpdateForm?: NgForm;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  dataSource: MatTableDataSource<any>;
+  dataSource!: MatTableDataSource<any>;
   events: Array<event> = [];
   eventsArray: Array<any> = [];
-  displayedColumns = ['nombre','descripcion','fecha','encargado','formulario','status'];
+  displayedColumns = ['nombre','fecha','encargado','formulario','status'];
   evento: event = {
     name: "",
     description: "",
@@ -36,11 +37,24 @@ export class AgendaComponent implements OnInit {
     status: '',
     formId: '',
   }
+  updateEvento: event = {
+    name: "",
+    description: "",
+    startDateTime: '',
+    endDateTime: '',
+    assignedTo: '',
+    status: '',
+    formId: '',
+  }
+
   formReady = false;
   dates: any = '';
   employees: Array<employee> = [];
   forms: Array<any> = [];
-
+  eventUpdate:any; 
+  eventDelete:any;
+  detailsCalendar = false;
+  
   public eventsCalendar: any = [];
 
   title:any;
@@ -50,6 +64,8 @@ export class AgendaComponent implements OnInit {
   employee:any;
   mostrar = false;
   menuOption = 'uno';
+  empleadosFiltrados: Array<any> = [];
+  empleadoSeleccionado = ''
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -77,12 +93,12 @@ export class AgendaComponent implements OnInit {
         for (let i = 0; i < this.events.length; i++) {
           this.eventsArray.push(createNewUser(successResponse[i]));
         }
+        this.dataSource = new MatTableDataSource(this.eventsArray);
       },
       (error) =>{
         console.log(error);
       }
     );
-    this.dataSource = new MatTableDataSource(this.eventsArray);
   }
 
   ngOnInit(): void {
@@ -94,9 +110,9 @@ export class AgendaComponent implements OnInit {
         for (let i = 0; i < success.length; i++) {
           var statusColor = '';
           if(success[i].status == 'Pendiente'){
-            statusColor = '#ffa806'
+            statusColor = '#f97300'
           }else if(success[i].status == 'Completado'){
-            statusColor = '#a8e147'
+            statusColor = '#2c8100'
           }else if(success[i].status == 'Retrasado'){
             statusColor = '#01051d'
           }
@@ -150,6 +166,35 @@ export class AgendaComponent implements OnInit {
     }
   }
 
+  filterEmployees(busqueda:any,vaciar:string){
+    this.empleadosFiltrados = [];
+    if(vaciar != ''){
+      var filterValue = (busqueda.target as HTMLInputElement).value;
+      filterValue.toString();
+      if(filterValue != ''){
+        for (let index = 0; index < this.employees.length; index++) {
+          if(this.employees[index].firstName.includes(filterValue)){
+            this.empleadosFiltrados.push(this.employees[index])
+          }
+        }
+      }else{
+        this.empleadosFiltrados = [];
+      }
+    }
+  }
+
+  seleccionarEmpleado(empleado:any){
+    this.filterEmployees(null,'')
+    this.empleadoSeleccionado =  empleado.firstName + ' ' + empleado.lastName;
+    this.evento.assignedTo = empleado.id;
+  }
+
+  seleccionarEmpleadoUpdate(empleado:any){
+    this.filterEmployees(null,'')
+    this.empleadoSeleccionado =  empleado.firstName + ' ' + empleado.lastName;
+    this.updateEvento.assignedTo = empleado.id;
+  }
+
   checkForm(){
     if(
       this.evento.name != ""
@@ -168,6 +213,12 @@ export class AgendaComponent implements OnInit {
   showDates(rangePicker: any){
     this.evento.startDateTime = rangePicker._model.selection.start
     this.evento.endDateTime = rangePicker._model.selection.end
+    this.checkForm();
+  }
+
+  showDatesUpdate(rangePicker: any){
+    this.updateEvento.startDateTime = rangePicker._model.selection.start
+    this.updateEvento.endDateTime = rangePicker._model.selection.end
     this.checkForm();
   }
 
@@ -200,7 +251,8 @@ export class AgendaComponent implements OnInit {
   }
 
   handleDateClick(arg:any){
-    this.value = 'http://localhost:4200/forms?formId='+arg.event.extendedProps.formId;
+    this.detailsCalendar = true;
+    this.value = 'https://auditoriasflow.es/#/forms?formId='+arg.event.extendedProps.formId;
 
     this.title = arg.event._def.title;
     this.description = arg.event.extendedProps.description;
@@ -209,6 +261,66 @@ export class AgendaComponent implements OnInit {
     this.employee = arg.event.extendedProps.employee;
   }
 
+  eventToUpdate(id:any){
+    this.eventUpdate = id;
+    console.log(id)
+    this.eventService.getEvent(id)
+    .subscribe(
+      (success)=>{
+        this.updateEvento.name = success.name,
+        this.updateEvento.description = success.description,
+        this.updateEvento.startDateTime = success.startDateTime,
+        this.updateEvento.endDateTime = success.endDateTime,
+        this.updateEvento.assignedTo = success.assignedTo,
+        this.updateEvento.formId = success.formId
+      },(error)=>{
+        console.log(error)
+      }
+    )
+  }
+
+  updateEvent(){
+    this.eventService.updateEvent(this.eventUpdate, this.updateEvento)
+    .subscribe(
+      (success)=>{
+        this.snackbar.open('Se actualizó el evento correctamente',undefined,{
+          duration: 2000
+        });
+          var tiempos = setTimeout(()=>{
+            window.location.reload();
+          },2000);      
+        },(error)=>{
+        this.snackbar.open('Error actualizando el evento',undefined,{
+          duration: 2000
+        });
+        console.log(error)
+      }
+    )
+  }
+
+  eventToDelete(id:any){
+    this.eventDelete = id;
+    console.log(id)
+  }
+
+  deleteEvent(){
+    this.eventService.deleteEvent(this.eventDelete)
+    .subscribe(
+      (success)=>{
+        this.snackbar.open('Se eliminó el evento correctamente',undefined,{
+          duration: 2000
+        });
+          var tiempos = setTimeout(()=>{
+            window.location.reload();
+          },2000);      
+        },(error)=>{
+        this.snackbar.open('Error eliminando el evento',undefined,{
+          duration: 2000
+        });
+        console.log(error)
+      }
+    )
+  }
 
 }
 
