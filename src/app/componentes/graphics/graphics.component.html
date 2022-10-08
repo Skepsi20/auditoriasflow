@@ -34,14 +34,15 @@
       <app-spinner></app-spinner>
     </div>
   </div>
-  <div class="row mt-4" *ngIf="listadoDeResultados && !mostrarDetallesDeResultados">
+  <div class="row mt-4" *ngIf="listadoDeResultados && !mostrarDetallesDeResultados && !spinnerRunning">
     <div style="margin:0px auto; width: 90%;">
       <h3>Listado de auditorías de {{filter.year}} para {{filter.form.name}}</h3>
       <table class="table">
         <thead class="table-dark">
           <tr>
+            <th scope="col"> 
+              <input type="checkbox" id="selected" (change)="agregarAFiltrado($event, 'all')"/></th>
             <th scope="col">#</th>
-            <th scope="col">Detalles</th>
             <th scope="col">Evento</th>
             <th scope="col">Periodo</th>
             <th scope="col">Responsable</th>
@@ -49,19 +50,25 @@
         </thead>
         <tbody style="background-color:white">
           <tr *ngFor="let resultado of listadoResultados; let i = index;">
-            <th scope="row">{{i+1}}</th>
             <td>
-              <input type="checkbox" id="selected" (change)="agregarAFiltrado($event, resultado.id)"/>
+              <input *ngIf="!selectAll" type="checkbox" id="selected" (change)="agregarAFiltrado($event, resultado.id)"/>
+              <div *ngIf="selectAll">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-check2-square" viewBox="0 0 16 16">
+                  <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                  <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                </svg>
+              </div>
             </td>
+            <td scope="row">{{i+1}}</td>
             <td>{{resultado.event.name}}</td>
-            <td>{{resultado.event.startDateTime}} - {{resultado.event.endDateTime}}</td>
+            <td>{{resultado.event.startDateTime | date: "mediumDate":"":"es"}} - {{resultado.event.endDateTime | date: "mediumDate":"":"es"}}</td>
             <td>{{resultado.employee.firstName}} {{resultado.employee.lastName}}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-  <div class="row" *ngIf="botonBuscarGraficos && !mostrarDetallesDeResultados">
+  <div class="row" *ngIf="botonBuscarGraficos && !mostrarDetallesDeResultados && !spinnerRunning">
     <div style="margin:0px auto; width: 90%;">
       <button (click)="preparacionDeGraficos()" class="btn btn-success" style="margin: 0px auto">Buscar</button>
     </div>
@@ -110,29 +117,44 @@
       </div><hr>
       <div class="row mb-4">
         <div class="col" align="center">
-          <h2>Situaciones de riesgo: </h2>
+          <h2>Situaciones de riesgo</h2>
           <div *ngFor="let image of arregloImagenes">
             <div class="col-4" style="float:left">
-              <div class="card text-center" align="center" style="height: 550px; margin-bottom: 30px; ">
-                <div class="card-header">
-                  {{image.employee}}: {{image.form}}
+              <div class="card text-center" align="center" style=" margin-bottom: 30px; ">
+                <div class="card-header" style="height: 60px;">
+                  <div class="col">
+                    {{image.employee}}: {{image.form}}
+                  </div>
                 </div>
                 <div class="card-body">
                   <div class="row">
-                    <img [src]="image.image" class="image" style="width: 90%; height: 350px; margin: 0px auto;">
+                    <img [src]="image.image" class="image">
                   </div>
                   <div class="row" style="text-align:center; margin-top:10px;">
-                    <p>{{image.comments}}</p>
+                    <p style="height: 100px; overflow: scroll;">{{image.comments}}</p>
                   </div>
                 </div>
                 <div class="card-footer text-muted">
-                  Fecha: {{image.period}}
+                  Fecha: {{image.period | date: "fullDate":"":"es"}}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>      
+      </div>          
+      <div class="encargados">        
+        <div class="col" align="center">
+          <h2>Encargados de auditorías</h2>
+          <div *ngFor="let employee of encargados" class="card employeeCard" style="width: 18rem; height: 430px;">
+            <img class="card-img-top" [src]="employee.image" alt="Imagen de empleado" style="height:230px;">
+            <div class="card-body" style="text-align: left; height: 200px;">
+              <p class="card-text"> <b>Encargado:</b> {{employee.name}}</p>
+              <p class="card-text"> <b>Auditoría:</b> {{employee.event}}</p>
+              <p class="card-text"> <b>Fecha:</b> {{employee.date | date: "fullDate":"":"es"}}</p>
+            </div>
+          </div>
+        </div>        
+      </div>
     </div>
   </div>
   <div *ngIf="!listadoDeResultados && filtradoFail">

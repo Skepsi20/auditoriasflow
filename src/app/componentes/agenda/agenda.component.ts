@@ -65,13 +65,14 @@ export class AgendaComponent implements OnInit {
   mostrar = false;
   menuOption = 'uno';
   empleadosFiltrados: Array<any> = [];
-  empleadoSeleccionado = ''
+  empleadoSeleccionado = '';
+  updateButton= false;
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     events: this.eventsCalendar,
     eventClick: this.handleDateClick.bind(this),
-    locale: esLocale
+    locale: esLocale,
   };
 
   /* QR INICIO */
@@ -94,6 +95,8 @@ export class AgendaComponent implements OnInit {
           this.eventsArray.push(createNewUser(successResponse[i]));
         }
         this.dataSource = new MatTableDataSource(this.eventsArray);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       },
       (error) =>{
         console.log(error);
@@ -106,7 +109,7 @@ export class AgendaComponent implements OnInit {
     this.eventService.getEvents()
     .subscribe(
       (success)=>{
-        console.log(success)
+        console.log('DATA',success)
         for (let i = 0; i < success.length; i++) {
           var statusColor = '';
           if(success[i].status == 'Pendiente'){
@@ -119,16 +122,18 @@ export class AgendaComponent implements OnInit {
           var inicio = new Date(success[i].startDateTime);
           var fin = new Date(success[i].endDateTime);
 
+          var final = (fin.getFullYear()).toString() +'-'+ (fin.getUTCMonth() + 1).toString().padStart(2, '0') +'-'+ (fin.getUTCDate()+1)
+    
           this.eventsCalendar[i] = {
             title: success[i].name,
             start: inicio.toISOString().split('T')[0],
-            end: fin.toISOString().split('T')[0],
+            end: final,
             description: success[i].description,
             status: success[i].status,
             form: success[i].form.code + ' - ' + success[i].form.name,
             formId: success[i].form.id,
             employee: success[i].employee.firstName +' '+success[i].employee.lastName,
-            color: statusColor
+            color: statusColor,
           }
         }
       },(error)=>{
@@ -151,11 +156,6 @@ export class AgendaComponent implements OnInit {
         console.log(error);
       }
     )
-  }
-
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {
@@ -326,14 +326,22 @@ export class AgendaComponent implements OnInit {
 
 function createNewUser(todas: any): any {
   let dateTime = todas.startDateTime +' / '+todas.endDateTime;
+  let status;
 
+  if(todas.status == 'Completado'){
+    status = false;
+  }else{
+    status = true
+  }
+  
   return {
     id: todas.id,
     name: todas.name,
     description: todas.description,
     date: dateTime,
     employee: todas.employee.firstName +' '+ todas.employee.lastName,
-    form: todas.form.code
+    form: todas.form.code,
+    status: status
   };
 }
 

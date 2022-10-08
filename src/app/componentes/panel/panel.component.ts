@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import jwt_decode from 'jwt-decode';
 import { EmployeesService } from 'src/app/services/employees/employees.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { ImageServiceService } from 'src/app/services/image-service.service';
 
 @Component({
   selector: 'panel',
@@ -14,11 +16,14 @@ export class PanelComponent implements OnInit {
   public cookieUser : string = '';
   decodedToken: any;
   usuario: any;
+  avatar: string = '';
 
   constructor(
         private cookieService : CookieService,
+        private userService: AuthService,
         private router: Router,
-        private employeesService: EmployeesService
+        private employeesService: EmployeesService,
+        private imageService: ImageServiceService
   ) { }
 
   ngOnInit(): void {
@@ -27,7 +32,12 @@ export class PanelComponent implements OnInit {
     .subscribe(
       (success)=>{
         this.usuario = success
-        console.log(this.usuario)
+        const imageDefault = this.imageService.getImage()
+        if(!success.profileImage){
+          this.avatar = imageDefault
+        }else{
+          this.avatar = success.profileImage
+        }
       },(error)=>{
         console.log(error)
       }
@@ -42,6 +52,8 @@ export class PanelComponent implements OnInit {
         this.opcionMenu = 'agenda'
       }
     }
+
+    
   }
 
   getDecodedAccessToken(accessToken: string): any {

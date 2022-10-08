@@ -36,3 +36,18 @@
 }
 
 .modal { background: rgba(000, 000, 000, 0.8); min-height:1000000px; }
+
+.employeeCard{
+  float:left; 
+  width: 250px; 
+  margin: 10px;
+  height: 400px;
+}
+
+.employeeCard img{
+  height: 90%;
+  width: 90%;
+  margin: 0px auto;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}

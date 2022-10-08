@@ -4,6 +4,11 @@ import { FormsService } from 'src/app/services/form/forms.service';
 import { SpinnerService } from 'src/app/services/spinner/spinner.service';
 import { Chart, registerables } from 'chart.js';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ImageServiceService } from 'src/app/services/image-service.service';
+import myLocaleEs from '@angular/common/locales/es'
+import {registerLocaleData} from '@angular/common';
+
+registerLocaleData(myLocaleEs);
 
 @Component({
   selector: 'graphics',
@@ -32,6 +37,9 @@ export class GraphicsComponent implements OnInit {
   searchReady = false;
   arregloDeEventos: Array<any> = [];
   arregloImagenes: Array<any> = [];
+  encargados: Array<any> = [];
+  spinnerRunning: boolean = false;
+  selectAll: boolean = false;
 
   // Charts
   chart:any;
@@ -44,7 +52,9 @@ export class GraphicsComponent implements OnInit {
   constructor(
     private formsService: FormsService,
     private spinnerService: SpinnerService,
-    private _sanitizer: DomSanitizer
+    private _sanitizer: DomSanitizer,
+    private imageService: ImageServiceService
+
   ) { }
 
   ngOnInit(): void {
@@ -69,7 +79,9 @@ export class GraphicsComponent implements OnInit {
 
   formSearch(){
     this.spinnerService.show();
-    this.listadoDeResultados = true;
+    this.spinnerRunning = true;
+    this.listadoResultados = [];
+    this.listadoDeResultados = false;
     this.filtradoFail = false;
     this.searchReady = true;
     this.graficsReady = false;
@@ -82,6 +94,7 @@ export class GraphicsComponent implements OnInit {
     .subscribe(
       (success)=>{
         this.spinnerService.hide();
+        this.spinnerRunning = false;
         if(!success.length){
           this.filtradoFail = true;
         }else{
@@ -95,16 +108,33 @@ export class GraphicsComponent implements OnInit {
   }
 
   agregarAFiltrado(event:any, resultId: any){
-    if(event.target.checked == true){
-      this.arregloDeEventos.push(resultId);
+    console.log(event, resultId)
+    if(event.target.checked == true && resultId == 'all'){
+      this.selectAll = true;
+      for (let index = 0; index < this.listadoResultados.length; index++) {
+        this.arregloDeEventos.push(this.listadoResultados[index].id)        
+      }
     }
-    else if(event.target.checked == false){
-      for (let index = 0; index < this.arregloDeEventos.length; index++) {
-        if(this.arregloDeEventos[index] == resultId){
-          this.arregloDeEventos.splice(index,1)
+    else if(event.target.checked == false && resultId == 'all'){
+      this.selectAll = false;
+      this.arregloDeEventos = []
+    }
+
+
+    else{
+      if(event.target.checked == true){
+        this.arregloDeEventos.push(resultId);
+      }
+      else if(event.target.checked == false){
+        for (let index = 0; index < this.arregloDeEventos.length; index++) {
+          if(this.arregloDeEventos[index] == resultId){
+            this.arregloDeEventos.splice(index,1)
+          }
         }
       }
     }
+
+    
     if(this.arregloDeEventos.length){
       this.botonBuscarGraficos = true;
     }else{
@@ -113,6 +143,7 @@ export class GraphicsComponent implements OnInit {
   }
 
   preparacionDeGraficos(){
+
     const request = {
       formId: this.filter.form.id,
       year: this.filter.year,
@@ -122,7 +153,19 @@ export class GraphicsComponent implements OnInit {
     .subscribe(
       (success)=>{
         console.table(success)
-        var arregloDatos = success;
+        //this.spinnerService.show();
+        
+        this.encargados = [];
+        this.labels = [];
+        this.commentsArray = [];
+        this.chart = [];
+        this.barChart = [];
+        this.acumuladoSi = [];
+        this.acumuladoNo = [];
+        this.arregloImagenes = [];
+
+        var arregloDatos = [];
+        arregloDatos = success;
         var arregloPreguntas = [];
         var arregloPorcentaje = [];
         var arregloComentarios = []
@@ -131,14 +174,34 @@ export class GraphicsComponent implements OnInit {
         var porcentaje = 0;
         var image64:any
 
-        arregloDatos.sort(((a, b) => b.negativeCounter - a.negativeCounter))
-        for (let index = 0; index < arregloDatos.length; index++) {
 
+        arregloDatos.sort(((a, b) => b.negativeCounter - a.negativeCounter))
+
+
+        for (let index = 0; index < arregloDatos.length-1; index++) {
           this.acumuladoSi.push(arregloDatos[index].positiveCounter)
           this.acumuladoNo.push(arregloDatos[index].negativeCounter)
+          this.labels.push("Pregunta: "+(index+1))
+        }
 
+        for (let index = 0; index < arregloDatos.length; index++) {
           if(index == arregloDatos.length-1){
             for (let i = 0; i < arregloDatos[index].details.length; i++) {
+              const imageDefault = this.imageService.getImage()
+              var imageToShow: any;
+              if(arregloDatos[index].details[i].employee.profileImage == null){
+                imageToShow = imageDefault
+              }else{
+                imageToShow = arregloDatos[index].details[i].employee.profileImage   
+              }
+              this.encargados.push(
+                {
+                  name: arregloDatos[index].details[i].employee.firstName + ' ' + arregloDatos[index].details[i].employee.lastName,
+                  image: imageToShow,
+                  event: arregloDatos[index].details[i].event.name,
+                  date: arregloDatos[index].details[i].creationDateTime
+                }
+              )
               image64 = arregloDatos[index].details[i].image;
               if(image64 != 'No image'){
                 this.arregloImagenes.push({
@@ -146,12 +209,11 @@ export class GraphicsComponent implements OnInit {
                   comments: arregloDatos[index].details[i].comments,
                   form: arregloDatos[index].details[i].event.name,
                   employee: arregloDatos[index].details[i].employee.firstName +' '+ arregloDatos[index].details[i].employee.lastName,
-                  period: arregloDatos[index].details[i].event.startDateTime +' / '+ arregloDatos[index].details[i].event.endDateTime
+                  period: arregloDatos[index].details[i].creationDateTime
                 })         
               }
             }
           }
-
 
           total = arregloDatos[index].negativeCounter + total;
           arregloPreguntas.push(arregloDatos[index].questionDescription)
@@ -167,12 +229,8 @@ export class GraphicsComponent implements OnInit {
             question: arregloDatos[index].questionDescription,
             respuestas: arregloComentarios
           }
-
-          this.labels.push("Pregunta: "+(index+1))
           arregloComentarios = [];
         }
-
-        console.log("LAS IMAGENES", this.arregloImagenes)
 
         for (let index = 0; index < arregloDatos.length; index++) {
           if(total != 0){
@@ -183,9 +241,12 @@ export class GraphicsComponent implements OnInit {
           }
           arregloPorcentaje.push(porcentaje*100)
         }
-        console.log("LABELS", this.labels)
-        console.log("SI", this.acumuladoSi)
-        console.log("NO", this.acumuladoNo)
+
+
+        arregloNo.pop()
+        arregloPreguntas.pop()
+        arregloPorcentaje.pop()
+
         this.barChart = document.getElementById('barChart');
         Chart.register(...registerables);
         new Chart(this.barChart,{
@@ -208,6 +269,13 @@ export class GraphicsComponent implements OnInit {
             ]
           },
           options:{
+            scales: {
+              yAxes: {
+                ticks: {
+                  stepSize: 1,
+                }
+              },
+            },
             responsive: true,
             plugins: {
               legend: {
@@ -285,6 +353,9 @@ export class GraphicsComponent implements OnInit {
             }
           }
         })
+        this.arregloDeEventos = [];
+        this.botonBuscarGraficos = false;
+        //this.spinnerService.hide();
       },(error)=>{
         console.log(error)
       }

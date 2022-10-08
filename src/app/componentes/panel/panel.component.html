@@ -1,15 +1,9 @@
 <mat-drawer-container class="example-container" autosize>
   <mat-drawer #drawer class="example-sidenav" [opened]="true" mode="side">
-    <div class="mat-drawer-inner-container">
-      <div class="row mb-2">
-        <div class="col">
-          <img src="../../../assets/img/Flowserve-Logo.jpg" alt="Flowserve logo" class="logo">
-        </div>
-      </div>
-
-    
+    <div class="mat-drawer-inner-container">  
     <div class="row">
-      <div class="col mb-4 textLogo">
+      <div class="col mb-4 textLogo" style="max-width: 250px;">
+        <img [src]="avatar" class="image"><br>
         <h4>Bienvenido</h4>
         <h4>{{usuario.firstName}}</h4>
         <h6>{{usuario.user.email}}</h6>
