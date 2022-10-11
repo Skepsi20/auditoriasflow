@@ -51,9 +51,7 @@ export class PanelComponent implements OnInit {
       if(this.opcionMenu == 'calendario'){
         this.opcionMenu = 'agenda'
       }
-    }
-
-    
+    }    
   }
 
   getDecodedAccessToken(accessToken: string): any {

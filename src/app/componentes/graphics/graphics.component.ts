@@ -40,6 +40,9 @@ export class GraphicsComponent implements OnInit {
   encargados: Array<any> = [];
   spinnerRunning: boolean = false;
   selectAll: boolean = false;
+  request:any 
+  pdfReport:string = '';
+  csvReport:string = '';
 
   // Charts
   chart:any;
@@ -143,13 +146,21 @@ export class GraphicsComponent implements OnInit {
   }
 
   preparacionDeGraficos(){
-
-    const request = {
+    this.request = {
       formId: this.filter.form.id,
       year: this.filter.year,
       resultsIds: this.arregloDeEventos
     }
-    this.formsService.getFormByYearandFiltered(request)
+
+
+    var idsList: Array<any> = []
+    for (let index = 0; index < this.request.resultsIds.length ; index++) {
+        idsList.push(this.request.resultsIds[index])
+    } 
+    this.pdfReport = 'https://flowservetlaxauditorias.azurewebsites.net/api/reports/pdf?formId='+this.request.formId+'&year='+this.request.year+'&idsList='+idsList 
+    this.csvReport = 'https://flowservetlaxauditorias.azurewebsites.net/api/reports/csv?formId='+this.request.formId+'&year='+this.request.year+'&idsList='+idsList 
+
+    this.formsService.getFormByYearandFiltered(this.request)
     .subscribe(
       (success)=>{
         console.table(success)
