@@ -18,14 +18,36 @@ export class AnswerService {
     return this.httpClient.get<answer[]>(this.baseApiUrl + '/api/results/');
   }
 
-  addAnswer(answerRequest: answer): Observable<answer>{
+  getAnswersById(resultId:string): Observable<any>{
+    return this.httpClient.get<answer[]>(this.baseApiUrl + '/api/results/'+resultId);
+  }
+
+  addAnswer(answerRequest: any): Observable<any>{
     const body: answer={
       eventId: answerRequest.eventId,
       assignedTo: answerRequest.assignedTo,
-      image: answerRequest.image,
       questions: answerRequest.questions
     };
     return this.httpClient.post<answer>(this.baseApiUrl+'/api/results/',body);
   }
 
+  updateAnswer(answerRequest: any, questionId: string):Observable<any>{
+    const body: any={
+      resultId: answerRequest.resultId,
+      description: answerRequest.description,
+      selection: answerRequest.selection,
+      comments: answerRequest.comments,
+      image: answerRequest.image
+    };
+    return this.httpClient.put<any>(this.baseApiUrl+'/api/questions/'+questionId,body);
+  }
+
+    //PUT api/events/{guid}/status
+
+  updateStatusToComplete(status: string, eventId: string):Observable<any>{
+    const body = {
+      status: status
+    }
+    return this.httpClient.put<any>(this.baseApiUrl+'/api/events/'+eventId+'/status',body);
+  }
 }

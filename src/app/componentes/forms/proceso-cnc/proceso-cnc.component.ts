@@ -77,7 +77,7 @@ export class ProcesoCNCComponent implements OnInit {
 
   functionReady(){
     this.preguntas[this.preguntas.length-1].respuesta = true;
-    this.respuestas.image = 'No image';
+    this.respuestas.image = undefined;
 
     var answered = 0;
     for (let i = 0; i < this.preguntas.length-1; i++) {

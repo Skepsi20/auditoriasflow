@@ -20,9 +20,9 @@
             <mat-form-field appearance="outline">
               <mat-label>Contraseña</mat-label>
               <input matInput [type]="hide ? 'password' : 'text'" [(ngModel)]="credential.password" name="password" required>
-              <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+              <div mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                 <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
+              </div>
               <mat-error *ngIf="credential.password">Contraseña requerida</mat-error>
             </mat-form-field>
           </div>

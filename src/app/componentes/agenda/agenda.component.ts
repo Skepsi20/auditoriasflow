@@ -51,11 +51,20 @@ export class AgendaComponent implements OnInit {
   dates: any = '';
   employees: Array<employee> = [];
   forms: Array<any> = [];
+  formsByModule: Array<any> = [];
   eventUpdate:any; 
   eventDelete:any;
+
   detailsCalendar = false;
-  
+  auditoriaSeleccionada = false;
+  modulo = '';
+  modules: Array<any> = ['BBS','Gemba Walk'];
+  gembaSelected = false;
   public eventsCalendar: any = [];
+  gembaAreas = ['GasPac','Pac Seal','Planta 52','Sistemas auxiliares'];
+  areaGemba = '';
+  auditores: Array<any> = [];
+
 
   title:any;
   description:any;
@@ -91,6 +100,7 @@ export class AgendaComponent implements OnInit {
     .subscribe(
       (successResponse)=>{
         this.events = successResponse;
+        this.events = this.events.reverse();
         for (let i = 0; i < this.events.length; i++) {
           this.eventsArray.push(createNewUser(successResponse[i]));
         }
@@ -117,13 +127,11 @@ export class AgendaComponent implements OnInit {
           }else if(success[i].status == 'Completado'){
             statusColor = '#2c8100'
           }else if(success[i].status == 'Retrasado'){
-            statusColor = '#01051d'
+            statusColor = 'red'
           }
           var inicio = new Date(success[i].startDateTime);
           var fin = new Date(success[i].endDateTime);
-
           var final = (fin.getFullYear()).toString() +'-'+ (fin.getUTCMonth() + 1).toString().padStart(2, '0') +'-'+ (fin.getUTCDate()+1)
-    
           this.eventsCalendar[i] = {
             title: success[i].name,
             start: inicio.toISOString().split('T')[0],
@@ -167,13 +175,20 @@ export class AgendaComponent implements OnInit {
   }
 
   filterEmployees(busqueda:any,vaciar:string){
+
     this.empleadosFiltrados = [];
     if(vaciar != ''){
       var filterValue = (busqueda.target as HTMLInputElement).value;
       filterValue.toString();
       if(filterValue != ''){
         for (let index = 0; index < this.employees.length; index++) {
-          if(this.employees[index].firstName.includes(filterValue)){
+          const completeName = this.employees[index].firstName.toLowerCase() + ' ' + this.employees[index].lastName.toLowerCase()
+          if(
+            this.employees[index].firstName.toLowerCase().includes(filterValue.toLowerCase()) || 
+            this.employees[index].lastName.toLowerCase().includes(filterValue.toLowerCase()) || 
+            completeName.includes(filterValue.toLowerCase())
+            
+            ){
             this.empleadosFiltrados.push(this.employees[index])
           }
         }
@@ -185,8 +200,8 @@ export class AgendaComponent implements OnInit {
 
   seleccionarEmpleado(empleado:any){
     this.filterEmployees(null,'')
+    this.auditores.push(empleado);
     this.empleadoSeleccionado =  empleado.firstName + ' ' + empleado.lastName;
-    this.evento.assignedTo = empleado.id;
   }
 
   seleccionarEmpleadoUpdate(empleado:any){
@@ -195,13 +210,56 @@ export class AgendaComponent implements OnInit {
     this.updateEvento.assignedTo = empleado.id;
   }
 
+  eliminarAuditor(empleado:any){
+    for (let index = 0; index < this.auditores.length; index++) {
+      if(this.auditores[index] == empleado){
+        this.auditores.splice(index, 1);
+      }      
+    }
+  }
+
+  checkModule(){ 
+    this.formsByModule = [];
+    if(this.modulo == 'BBS'){
+      this.auditoriaSeleccionada = true;
+      this.gembaSelected = false;
+      for (let index = 0; index < this.forms.length; index++) {
+        if(this.forms[index].module == 'BBS'){
+          this.formsByModule.push(this.forms[index])
+        }
+      }
+    }else if(this.modulo == 'Gemba Walk'){
+      this.auditoriaSeleccionada = false;
+      this.gembaSelected = true;
+    }
+  }
+
+  checkGembaArea(){
+    this.formsByModule = [];
+    this.auditoriaSeleccionada = true;
+    for (let index = 0; index < this.forms.length; index++) {
+      if(this.forms[index].area == 'GasPac' && this.areaGemba == 'GasPac'){
+        this.formsByModule.push(this.forms[index])
+      }
+      if(this.forms[index].area == 'Pac Seal' && this.areaGemba == 'Pac Seal'){
+        this.formsByModule.push(this.forms[index])
+      }
+      if(this.forms[index].area == 'Planta 52' && this.areaGemba == 'Planta 52'){
+        this.formsByModule.push(this.forms[index])
+      }
+      if(this.forms[index].area == 'Sistemas auxiliares' && this.areaGemba == 'Sistemas auxiliares'){
+        this.formsByModule.push(this.forms[index])
+      }
+    }    
+  }
+
+
   checkForm(){
     if(
       this.evento.name != ""
     && this.evento.description != ""
     && this.evento.startDateTime != ''
     && this.evento.endDateTime != ''
-    && this.evento.assignedTo != ''
     && this.evento.formId != ''
     ){
       this.formReady = true;
@@ -224,29 +282,30 @@ export class AgendaComponent implements OnInit {
 
   add(){
     if(this.formReady){
-      const eventRequest = {
-        name: this.evento.name,
-        description: this.evento.description,
-        startDateTime: this.evento.startDateTime,
-        endDateTime: this.evento.endDateTime,
-        assignedTo: this.evento.assignedTo,
-        status: 'Pendiente',
-        formId: this.evento.formId,
-      }
-      this.eventService.addEvents(eventRequest)
-      .subscribe(
-        (successResponse)=>{
-          this.snackbar.open('Se creó el evento correctamente',undefined,{
-            duration: 2000
-          });
-          window.location.reload();
-        },
-        (error) =>{
-          this.snackbar.open('Error creando el evento, intente nuevamente.',undefined,{
-            duration: 2000
-          });
+      for (let index = 0; index < this.auditores.length; index++) {
+        const eventRequest = {
+          name: this.evento.name,
+          description: this.evento.description,
+          startDateTime: this.evento.startDateTime,
+          endDateTime: this.evento.endDateTime,
+          assignedTo: this.auditores[index].id,
+          status: 'Pendiente',
+          formId: this.evento.formId,
         }
-      );
+        this.eventService.addEvents(eventRequest)
+        .subscribe(
+          (successResponse)=>{
+            this.snackbar.open('Se creó el evento correctamente',undefined,{
+              duration: 1000
+            });
+          },
+          (error) =>{
+            this.snackbar.open('Error creando el evento, intente nuevamente.',undefined,{
+              duration: 2000
+            });
+          }
+        );
+      }
     }
   }
 

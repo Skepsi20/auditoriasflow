@@ -31,5 +31,5 @@ export class FormsService {
     }
     return this.httpClient.post<any[]>(this.baseApiUrl + '/api/forms/'+request.formId+'/results-grouped',body);
   }
-
+  
 }

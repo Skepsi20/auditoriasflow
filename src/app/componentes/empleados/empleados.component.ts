@@ -17,9 +17,11 @@ import { ImageServiceService } from 'src/app/services/image-service.service';
 export class EmpleadosComponent implements OnInit {
   @ViewChild('employeeForm') employeeForm?: NgForm;
   @ViewChild('adminForm') adminForm?: NgForm;
-  @ViewChild(MatPaginator) paginatorEmployee!: MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatPaginator) paginatorAdmin!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) sortAdmin!: MatSort;
+
 
   formReady = false;
   displayedColumns = ['nombre','matricula','opciones'];
@@ -75,9 +77,8 @@ export class EmpleadosComponent implements OnInit {
           this.employeeArray.push(createNewUser(successResponse[i]));
         }
         this.dataSource = new MatTableDataSource(this.employeeArray);
-        this.dataSource.paginator = this.paginatorEmployee;
-        this.dataSource.sort = this.sort;
-
+         this.dataSource.paginator = this.paginator;
+         this.dataSource.sort = this.sort;
       },
       (error) =>{
         console.log(error);
@@ -93,9 +94,6 @@ export class EmpleadosComponent implements OnInit {
           this.administratorsArray.push(createNewUserAdmin(successResponse[i]));
         }
         this.dataSourceAdmin = new MatTableDataSource(this.administratorsArray);
-        this.dataSourceAdmin.paginator = this.paginatorAdmin;
-        this.dataSourceAdmin.sort = this.sort;
-
       },
       (error) =>{
         console.log(error);
@@ -109,6 +107,7 @@ export class EmpleadosComponent implements OnInit {
       lastName: '',
       officialId: ''
     }
+    console.log("TAMAÑO ",this.employees)
   }
 
   applyFilter(event: Event) {
@@ -116,6 +115,14 @@ export class EmpleadosComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
+    }
+  }
+
+  applyFilterAdmin(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSourceAdmin.filter = filterValue.trim().toLowerCase();
+    if (this.dataSourceAdmin.paginator) {
+      this.dataSourceAdmin.paginator.firstPage();
     }
   }
 
@@ -210,21 +217,6 @@ export class EmpleadosComponent implements OnInit {
   }
 
   updateEmployee(){
-    
-
-     /*  this.employeService.updateUserPicture(this.userToUpdate, request)
-      .subscribe(
-        (success)=>{
-          this.snackbar.open('Imagen actualizada',undefined,{
-            duration: 2000
-          });
-        },(error)=>{
-          console.log(error)
-        }
-      ) 
-       */
-    
-
     this.employeService.updateEmployee(this.userToUpdate, this.request)
     .subscribe(
       (success)=>{
@@ -374,7 +366,6 @@ function createNewUser(todas: any): any {
 }
 
 function createNewUserAdmin(todas: any): any {
-  console.log(todas,"DATOS DEL ADMIN")
 
   return {
     id: todas.id,

@@ -37,12 +37,21 @@ export class GraphicsComponent implements OnInit {
   searchReady = false;
   arregloDeEventos: Array<any> = [];
   arregloImagenes: Array<any> = [];
+  todasLasImagenes: Array<any> = [];
   encargados: Array<any> = [];
   spinnerRunning: boolean = false;
   selectAll: boolean = false;
   request:any 
   pdfReport:string = '';
   csvReport:string = '';
+
+  formsByModule: Array<any> = [];
+  gembaSelected = false;
+  auditoriaSeleccionada = false;
+  modulo = '';
+  modules: Array<any> = ['BBS','Gemba Walk'];
+  gembaAreas = ['GasPac','Pac Seal','Planta 52','Sistemas auxiliares'];
+  areaGemba = '';
 
   // Charts
   chart:any;
@@ -69,6 +78,42 @@ export class GraphicsComponent implements OnInit {
         console.log(error)
       }
     )
+  }
+
+  checkModule(){ 
+    this.formsByModule = [];
+    if(this.modulo == 'BBS'){
+      this.auditoriaSeleccionada = true;
+      this.gembaSelected = false;
+      for (let index = 0; index < this.forms.length; index++) {
+        if(this.forms[index].module == 'BBS'){
+          this.formsByModule.push(this.forms[index])
+        }
+      }
+      console.log("Formularios de bbs",this.forms)
+    }else if(this.modulo == 'Gemba Walk'){
+      this.auditoriaSeleccionada = false;
+      this.gembaSelected = true;
+    }
+  }
+
+  checkGembaArea(){
+    this.formsByModule = [];
+    this.auditoriaSeleccionada = true;
+    for (let index = 0; index < this.forms.length; index++) {
+      if(this.forms[index].area == 'GasPac' && this.areaGemba == 'GasPac'){
+        this.formsByModule.push(this.forms[index])
+      }
+      if(this.forms[index].area == 'Pac Seal' && this.areaGemba == 'Pac Seal'){
+        this.formsByModule.push(this.forms[index])
+      }
+      if(this.forms[index].area == 'Planta 52' && this.areaGemba == 'Planta 52'){
+        this.formsByModule.push(this.forms[index])
+      }
+      if(this.forms[index].area == 'Sistemas auxiliares' && this.areaGemba == 'Sistemas auxiliares'){
+        this.formsByModule.push(this.forms[index])
+      }
+    }    
   }
 
   checkForm(){
@@ -158,12 +203,17 @@ export class GraphicsComponent implements OnInit {
         idsList.push(this.request.resultsIds[index])
     } 
     this.pdfReport = 'https://flowservetlaxauditorias.azurewebsites.net/api/reports/pdf?formId='+this.request.formId+'&year='+this.request.year+'&idsList='+idsList 
-    this.csvReport = 'https://flowservetlaxauditorias.azurewebsites.net/api/reports/csv?formId='+this.request.formId+'&year='+this.request.year+'&idsList='+idsList 
+    this.csvReport = 'https://flowservetlaxauditorias.azurewebsites.net/api/reports/excel?formId='+this.request.formId+'&year='+this.request.year+'&idsList='+idsList 
 
     this.formsService.getFormByYearandFiltered(this.request)
     .subscribe(
       (success)=>{
-        console.table(success)
+        console.table("LA MAMADA QUE QUIERE OMAR",success)
+
+        for (let index = 0; index < success.length; index++) {
+          var item = success[index];
+          item.index = index+1;
+        }
         //this.spinnerService.show();
         
         this.encargados = [];
@@ -179,21 +229,37 @@ export class GraphicsComponent implements OnInit {
         arregloDatos = success;
         var arregloPreguntas = [];
         var arregloPorcentaje = [];
-        var arregloComentarios = []
+        var arregloComentarios = [];
         var arregloNo = [];
         var total = 0;
         var porcentaje = 0;
         var image64:any
-
-
         arregloDatos.sort(((a, b) => b.negativeCounter - a.negativeCounter))
 
-
         for (let index = 0; index < arregloDatos.length-1; index++) {
+          var item = arregloDatos[index];
           this.acumuladoSi.push(arregloDatos[index].positiveCounter)
           this.acumuladoNo.push(arregloDatos[index].negativeCounter)
-          this.labels.push("Pregunta: "+(index+1))
-        }
+          this.labels.push("Pregunta: "+(item.index))
+        }        
+
+              this.todasLasImagenes = [];
+              //METER TODAS LAS IMAGENES EN UN ARREGLO
+              for (let index = 0; index < arregloDatos.length; index++) {
+                for (let j = 0; j < arregloDatos[index].details.length; j++) {
+                  if(arregloDatos[index].details[j].image){
+                    this.todasLasImagenes.push({
+                      image:arregloDatos[index].details[j].image,
+                      auditor: arregloDatos[index].details[j].employee.firstName +' '+ arregloDatos[index].details[j].employee.lastName,
+                      auditoria: arregloDatos[index].details[j].event.name,
+                      fecha:  arregloDatos[index].details[j].creationDateTime,
+                      descripcion: arregloDatos[index].questionDescription,
+                      comentarios: arregloDatos[index].details[j].comments,
+                    });
+                  }
+    
+                }                
+              }
 
         for (let index = 0; index < arregloDatos.length; index++) {
           if(index == arregloDatos.length-1){
@@ -213,8 +279,9 @@ export class GraphicsComponent implements OnInit {
                   date: arregloDatos[index].details[i].creationDateTime
                 }
               )
+
               image64 = arregloDatos[index].details[i].image;
-              if(image64 != 'No image'){
+              if(image64 != 'No image' || image64){
                 this.arregloImagenes.push({
                   image: image64,
                   comments: arregloDatos[index].details[i].comments,
@@ -238,8 +305,11 @@ export class GraphicsComponent implements OnInit {
           }
           this.commentsArray[index] = {
             question: arregloDatos[index].questionDescription,
-            respuestas: arregloComentarios
+            respuestas: arregloComentarios,
+            image: arregloDatos[index].details[0].image
           }
+          console.log(arregloDatos[index].details[0].image)
+          console.log(this.commentsArray)
           arregloComentarios = [];
         }
 
