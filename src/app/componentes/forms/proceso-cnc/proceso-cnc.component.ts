@@ -10,8 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./proceso-cnc.component.css']
 })
 export class ProcesoCNCComponent implements OnInit {
-
-
+ngOnInit(): void {
+  
+}
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador está usando completo y correctamente su EPP al intervenir su equipo (lentes, tapones, botas, faja, recuerde que para partes rotatorias no se debe usar guantes)',
@@ -182,5 +184,5 @@ export class ProcesoCNCComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

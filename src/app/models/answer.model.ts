@@ -1,7 +1,7 @@
 export interface answer {
     eventId: string,
     assignedTo: string,
-    image?: string,
+    image?: Array<string>,
     questions: Array<answerDetail>
   }
 
@@ -10,5 +10,5 @@ export interface answerDetail{
   description: string,
   selection?: boolean,
   comments: string,
-  image?: string
+  image?: Array<string>
 }

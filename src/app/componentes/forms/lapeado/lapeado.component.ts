@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./lapeado.component.css']
 })
 export class LapeadoComponent implements OnInit {
-
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador(a) está usando correctamente y completo su EPP (guantes, lentes, tapones, botas, peto)',
@@ -176,5 +179,5 @@ export class LapeadoComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./gruas.component.css']
 })
 export class GruasComponent implements OnInit {
-
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador está utilizando correctamente y completo su EPP (guantes, casco, lentes, tapones y botas)',
@@ -176,5 +179,5 @@ export class GruasComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

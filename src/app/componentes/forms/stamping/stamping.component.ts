@@ -14,6 +14,7 @@ import { GasPacService } from 'src/app/services/form/gembaWalk/gas-pac.service';
 import { PacSealService } from 'src/app/services/form/gembaWalk/pac-seal.service';
 import { Planta52Service } from 'src/app/services/form/gembaWalk/planta52.service';
 import { SistemasAuxiliaresService } from 'src/app/services/form/gembaWalk/sistemas-auxiliares.service';
+import { FormsService } from 'src/app/services/form/forms.service';
 
 @Component({
   selector: 'stamping',
@@ -480,19 +481,21 @@ export class StampingComponent implements OnInit {
   public respuestas: answer = {
     eventId: '',
     assignedTo: '',
-    image: 'No image',
+    image: ['No image'],
     questions: [{
       description: '',
       selection: false,
       comments: '',
-      image:''
+      image:[]
     }]
   }
   public answersArray: Array<answerDetail> = [];
   public selectedQuestion = 0;
   public formReady = false;
   public archivos: any = [];
-  public previsualizacion: Array<string> = [];
+  public previsualizacion: Array<any> = [];
+  public previsualizacionBBS: string = '';
+  public previsualizacionesGW: Array<any> = [];
   public userAccepted = false;
   public userId = '';
   public notAccepted = false;
@@ -508,6 +511,7 @@ export class StampingComponent implements OnInit {
   bbsName=''
   employeeName = ''
   module=''
+  formActual:any;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -516,6 +520,7 @@ export class StampingComponent implements OnInit {
     private answerService: AnswerService,
     private employeeService: EmployeesService,
     private cookieService: CookieService,
+    private formService: FormsService,
     private readonly spinnerService: SpinnerService,
     private readonly bbsService: BbsFormQuestionsService,
     private readonly gasPacService: GasPacService,
@@ -546,111 +551,137 @@ export class StampingComponent implements OnInit {
         this.cookieService.set('refreshToken', success.refreshToken);
         if(success.accessToken){
           var tokenDecoded:any = jwt_decode(success.accessToken);
-          this.formCode = tokenDecoded["FormCode"];
+          this.formCode = tokenDecoded["FormId"];
           this.userId = tokenDecoded["EmployeeId"];
           this.eventId = tokenDecoded["EventId"];
           this.resultId = tokenDecoded['ResultId'];
         }
 
-        this.employeeService.getEmployeeLogged()
+        this.formService.getFormById(this.formCode)
         .subscribe(
           (success)=>{
-            console.log(success)
-            this.employeeName = success.firstName + ' '+success.lastName;
+            this.formActual = success;
+            this.userAccepted = true;
+            this.notAccepted = false;
+
+            console.log("Result id antes de questions",this.resultId)
+            if(this.resultId){
+              this.getQuestions();
+            }else{
+              //Asignación de formulario
+              //BBS
+              if(this.formActual.module == 'BBS'){
+                if(this.formActual.code == 'STP62'){ this.preguntas = this.bbsService.preguntasStamping; this.bbsName = 'BBS STAMPING P62'; this.module = 'BBS';
+                }else if(this.formActual.code == 'CMDR'){ this.preguntas = this.bbsService.preguntasComedor; this.bbsName = 'BBS COMEDOR'; this.module = 'BBS';
+                }else if(this.formActual.code == 'ALM52'){ this.preguntas = this.bbsService.preguntasAlmacen; this.bbsName = 'BBS ALMACÉN PLANTA 52'; this.module = 'BBS';
+                }else if(this.formActual.code == 'SOL72'){ this.preguntas = this.bbsService.preguntasSoldadura; this.bbsName = 'BBS SOLDADURA P72'; this.module = 'BBS';
+                }else if(this.formActual.code == 'CNC52'){ this.preguntas = this.bbsService.preguntasCNC; this.bbsName = 'BBS Proceso CNC, LCS'; this.module = 'BBS';
+                }else if(this.formActual.code == 'CTE52'){ this.preguntas = this.bbsService.preguntasAreaDeCorte; this.bbsName = 'BBS AREA DE CORTE P52'; this.module = 'BBS';
+                }else if(this.formActual.code == 'ENS72'){ this.preguntas = this.bbsService.preguntasEnsambleP72; this.bbsName = 'BBS ENSAMBLE P72'; this.module = 'BBS';
+                }else if(this.formActual.code == 'LP62'){ this.preguntas = this.bbsService.preguntasLapeado; this.bbsName = 'BBS LAPEADO P62'; this.module = 'BBS';
+                }else if(this.formActual.code == 'GRA'){ this.preguntas = this.bbsService.preguntasGruas; this.bbsName = 'BBS USO DE GRÚAS SA'; this.module = 'BBS';
+                }else if(this.formActual.code == 'TM52'){ this.preguntas = this.bbsService.preguntasTonoManual; this.bbsName = 'BBS TORNO MANUAL P52'; this.module = 'BBS';
+                }else if(this.formActual.code == 'RM62'){ this.preguntas = this.bbsService.preguntasRubber; this.bbsName = 'BBS RUBBER MOLDING P62'; this.module = 'BBS';
+                }else if(this.formActual.code == 'ENS62'){ this.preguntas = this.bbsService.preguntasEnsambleP62; this.bbsName = 'BBS ENSAMBLE P62'; this.module = 'BBS';
+                }else if(this.formActual.code == 'ISC62'){ this.preguntas = this.bbsService.preguntasISC; this.bbsName = 'BBS ISC P62'; this.module = 'BBS';
+                }
+              }else if(this.formActual.module == 'Gemba Walk' && this.formActual.area == 'GasPac'){        
+                //Gas Pac
+                if(this.formActual.code == 'CYSDS'){ this.preguntas = this.gasPacService.coloresDeSeguridad; this.bbsName = 'Gas Pac - Colores y señales de seguridad'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CGAYPA'){ this.preguntas = this.gasPacService.controlesGeneralesAmbientalesYPrimerosAuxilios; this.bbsName = 'Gas Pac - Controles generales ambientales y primeros auxilios'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'ELEC'){ this.preguntas = this.gasPacService.electrico; this.bbsName = 'Gas Pac - Eléctrico'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EPCI'){ this.preguntas = this.gasPacService.equipoDeProteccionContraIncendio; this.bbsName = 'Gas Pac - Equipo de protección contra incendio'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EPP'){ this.preguntas = this.gasPacService.equipoDeProteccionPersonal; this.bbsName = 'Gas Pac - Equipo de protección personal'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EGYAC'){ this.preguntas = this.gasPacService.equipoDeGasYAireComprimido; this.bbsName = 'Gas Pac - Equipos de gas y aire comprimido'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'HMPYE'){ this.preguntas = this.gasPacService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Gas Pac - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYADM'){ this.preguntas = this.gasPacService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Gas Pac - Manipulación y almacenamiento de materiales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYHM'){ this.preguntas = this.gasPacService.maquinariaYHerramientasManuales; this.bbsName = 'Gas Pac - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MDS'){ this.preguntas = this.gasPacService.mediosDeSalida; this.bbsName = 'Gas Pac - Medios de salida'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'PDP'){ this.preguntas = this.gasPacService.pruebasDePresion; this.bbsName = 'Gas Pac - Pruebas de presión'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SOYCA'){ this.preguntas = this.gasPacService.saludOcupacionalYControlAmbiental; this.bbsName = 'Gas Pac - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SPCYT'){ this.preguntas = this.gasPacService.superficiesParaCaminarYTrabajar; this.bbsName = 'Gas Pac - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'STYP'){ this.preguntas = this.gasPacService.sustanciasToxicasYPeligrosas; this.bbsName = 'Gas Pac - Sustancias tóxicas y peligrosas'; this.module = 'GembaWalk';
+                }
+              }else if(this.formActual.module == 'Gemba Walk' && this.formActual.area == 'Pac Seal'){
+              //Pac Seal
+                if(this.formActual.code == 'CYSDS'){ this.preguntas = this.pacsealService.coloresDeSeguridad; this.bbsName = 'Pac Seal - Colores y señales de seguridad'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CI'){ this.preguntas = this.pacsealService.contraIncendio; this.bbsName = 'Pac Seal - Contra incendio'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CGAYPA'){ this.preguntas = this.pacsealService.controlesGeneralesAmbientalesYPrimerosAuxilios; this.bbsName = 'Pac Seal - Controles generales ambientales y primeros auxilios'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'ELEC'){ this.preguntas = this.pacsealService.electrico; this.bbsName = 'Pac Seal - Eléctrico'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EPP'){ this.preguntas = this.pacsealService.equipoDeProteccionPersonal; this.bbsName = 'Pac Seal - Equipo de protección personal'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EDGCYAC'){ this.preguntas = this.pacsealService.equiposDeGasComprimidoYAireComprimido; this.bbsName = 'Pac Seal - Equipos de gas comprimido y aire comprimido'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'HDMPYE'){ this.preguntas = this.pacsealService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Pac Seal - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYADM'){ this.preguntas = this.pacsealService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Pac Seal - Manipulacion y almacenamiento de materiales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYHM'){ this.preguntas = this.pacsealService.maquinariaYHerramientasManuales; this.bbsName = 'Pac Seal - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MDS'){ this.preguntas = this.pacsealService.mediosDeSalida; this.bbsName = 'Pac Seal - Medios de salida'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SOYCA'){ this.preguntas = this.pacsealService.saludOcupacionalYControlAmbiental; this.bbsName = 'Pac Seal - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SPCYT'){ this.preguntas = this.pacsealService.superficiesParaCaminarYTrabajar; this.bbsName = 'Pac Seal - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'STYPP'){ this.preguntas = this.pacsealService.sustanciasToxicasYPeligrosasPacseal; this.bbsName = 'Pac Seal - Sustancias tóxicas y peligrosas pacseal'; this.module = 'GembaWalk';
+                }
+              }else if(this.formActual.module == 'Gemba Walk' && this.formActual.area == 'Planta 52'){
+                //Planta 52
+                if(this.formActual.code == 'CYSDS'){ this.preguntas = this.plantaService.coloresYSegnalesDeSeguridad; this.bbsName = 'Planta 52 - Colores y señales de seguridad'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CI'){ this.preguntas = this.plantaService.contraIncendio; this.bbsName = 'Planta 52 - Contra incendio'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CAGYPA'){ this.preguntas = this.plantaService.controlesAmbientalesGeneralesYPrimerosAuxilios; this.bbsName = 'Planta 52 - Controles ambientales generales y primeros auxilios'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CSYE'){ this.preguntas = this.plantaService.corteSoldaduraYElectrico; this.bbsName = 'Planta 52 - Corte soldadura y eléctrico'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'ELEC'){ this.preguntas = this.plantaService.electrico; this.bbsName = 'Planta 52 - Eléctrico'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EPP'){ this.preguntas = this.plantaService.equipoDeProteccionPersonal; this.bbsName = 'Planta 52 - Equipo de protección personal'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EDGCYAC'){ this.preguntas = this.plantaService.equiposDeGasComprimidoYAireComprimido; this.bbsName = 'Planta 52 - Equipos de gas comprimido y aire comprimido'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'HDMPYE'){ this.preguntas = this.plantaService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Planta 52 - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYADM'){ this.preguntas = this.plantaService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Planta 52 - Manipulación y almacenamiento de materiales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYHM'){ this.preguntas = this.plantaService.maquinariaYHerramientasManuales; this.bbsName = 'Planta 52 - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MDS'){ this.preguntas = this.plantaService.mediosDeSalida; this.bbsName = 'Planta 52 - Medios de salida'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'PDP'){ this.preguntas = this.plantaService.pruebasDePresion; this.bbsName = 'Planta 52 - Pruebas de presión'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SOYCA'){ this.preguntas = this.plantaService.saludOcupacionalYControlAmbiental; this.bbsName = 'Planta 52 - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SPCYT'){ this.preguntas = this.plantaService.superficiesParaCaminarYTrabajar; this.bbsName = 'Planta 52 - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'STYPP52'){ this.preguntas = this.plantaService.sustanciasToxicasYPeligrosasPlanta52; this.bbsName = 'Planta 52 - Sustancias tóxicas y peligrosas planta52'; this.module = 'GembaWalk';
+                }
+              }else if(this.formActual.module == 'Gemba Walk' && this.formActual.area == 'Sistemas auxiliares'){
+                //Sistemas auxiliares
+                if(this.formActual.code == 'APPCSI'){ this.preguntas = this.sistemasAuxiliaresService.acabadosPorPulverizacionConSubstanciasInflamables; this.bbsName = 'Sistemas auxiliares - Acabados por pulverización con substancias inflamables'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CYSDS'){ this.preguntas = this.sistemasAuxiliaresService.coloresYSegnalesDeSeguridad; this.bbsName = 'Sistemas auxiliares - Colores y señales de seguridad'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CI'){ this.preguntas = this.sistemasAuxiliaresService.contraIncendio; this.bbsName = 'Sistemas auxiliares - Contra incendio'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CAGYPA'){ this.preguntas = this.sistemasAuxiliaresService.controlesAmbientalesGeneralesYPrimerosAuxilios; this.bbsName = 'Sistemas auxiliares - Controles ambientales generales y primeros auxilios'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'CSYE'){ this.preguntas = this.sistemasAuxiliaresService.corteSoldaduraYElectrico; this.bbsName = 'Sistemas auxiliares - Corte soldadura y eléctrico'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'ELEC'){ this.preguntas = this.sistemasAuxiliaresService.electrico; this.bbsName = 'Sistemas auxiliares - Eléctrico'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EDPP'){ this.preguntas = this.sistemasAuxiliaresService.equipoDeProteccionPersonal; this.bbsName = 'Sistemas auxiliares - Equipo de protección personal'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'EDGCYAC'){ this.preguntas = this.sistemasAuxiliaresService.equiposDeGasComprimidoYAireComprimido; this.bbsName = 'Sistemas auxiliares - Equipos de gas comprimido y aire comprimido'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'HDMPYE'){ this.preguntas = this.sistemasAuxiliaresService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Sistemas auxiliares - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYADM'){ this.preguntas = this.sistemasAuxiliaresService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Sistemas auxiliares - Manipulación y almacenamiento de materiales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MYHM'){ this.preguntas = this.sistemasAuxiliaresService.maquinariaYHerramientasManuales; this.bbsName = 'Sistemas auxiliares - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'MDS'){ this.preguntas = this.sistemasAuxiliaresService.mediosDeSalida; this.bbsName = 'Sistemas auxiliares - Medios de salida'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'PDP'){ this.preguntas = this.sistemasAuxiliaresService.pruebasDePresion; this.bbsName = 'Sistemas auxiliares - Pruebas de presión'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SOYCA'){ this.preguntas = this.sistemasAuxiliaresService.saludOcupacionalYControlAmbiental; this.bbsName = 'Sistemas auxiliares - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'SPCYT'){ this.preguntas = this.sistemasAuxiliaresService.superficiesParaCaminarYTrabajar; this.bbsName = 'Sistemas auxiliares - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
+                }else if(this.formActual.code == 'STYPSA'){ this.preguntas = this.sistemasAuxiliaresService.sustanciasToxicasYPeligrosasSistemasAuxiliares; this.bbsName = 'Sistemas auxiliares - Sustancias tóxicas y peligrosas sistemas auxiliares'; this.module = 'GembaWalk';
+                }
+              }
+            }
           },(error)=>{
             console.log(error)
           }
         )
 
+        this.employeeService.getEmployeeLogged()
+        .subscribe(
+          (success)=>{
+            this.employeeName = success.firstName + ' '+success.lastName;
+          },(error)=>{
+            console.log(error)
+          }
+        )       
 
-        //BBS
-        if(this.formCode == 'STP62'){ this.preguntas = this.bbsService.preguntasStamping; this.bbsName = 'BBS STAMPING P62'; this.module = 'BBS';
-        }else if(this.formCode == 'CMDR'){ this.preguntas = this.bbsService.preguntasComedor; this.bbsName = 'BBS COMEDOR'; this.module = 'BBS';
-        }else if(this.formCode == 'ALM52'){ this.preguntas = this.bbsService.preguntasAlmacen; this.bbsName = 'BBS ALMACÉN PLANTA 52'; this.module = 'BBS';
-        }else if(this.formCode == 'SOL72'){ this.preguntas = this.bbsService.preguntasSoldadura; this.bbsName = 'BBS SOLDADURA P72'; this.module = 'BBS';
-        }else if(this.formCode == 'CNC52'){ this.preguntas = this.bbsService.preguntasCNC; this.bbsName = 'BBS Proceso CNC, LCS'; this.module = 'BBS';
-        }else if(this.formCode == 'CTE52'){ this.preguntas = this.bbsService.preguntasAreaDeCorte; this.bbsName = 'BBS AREA DE CORTE P52'; this.module = 'BBS';
-        }else if(this.formCode == 'ENS72'){ this.preguntas = this.bbsService.preguntasEnsambleP72; this.bbsName = 'BBS ENSAMBLE P72'; this.module = 'BBS';
-        }else if(this.formCode == 'LP62'){ this.preguntas = this.bbsService.preguntasLapeado; this.bbsName = 'BBS LAPEADO P62'; this.module = 'BBS';
-        }else if(this.formCode == 'GRA'){ this.preguntas = this.bbsService.preguntasGruas; this.bbsName = 'BBS USO DE GRÚAS SA'; this.module = 'BBS';
-        }else if(this.formCode == 'TM52'){ this.preguntas = this.bbsService.preguntasTonoManual; this.bbsName = 'BBS TORNO MANUAL P52'; this.module = 'BBS';
-        }else if(this.formCode == 'RM62'){ this.preguntas = this.bbsService.preguntasRubber; this.bbsName = 'BBS RUBBER MOLDING P62'; this.module = 'BBS';
-        }else if(this.formCode == 'ENS62'){ this.preguntas = this.bbsService.preguntasEnsambleP62; this.bbsName = 'BBS ENSAMBLE P62'; this.module = 'BBS';
-        }else if(this.formCode == 'ISC62'){ this.preguntas = this.bbsService.preguntasISC; this.bbsName = 'BBS ISC P62'; this.module = 'BBS';
 
-        //Gas Pac
-        }else if(this.formCode == 'CYSDS'){ this.preguntas = this.gasPacService.coloresDeSeguridad; this.bbsName = 'Gas Pac - Colores y señales de seguridad'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CGAYPA'){ this.preguntas = this.gasPacService.controlesGeneralesAmbientalesYPrimerosAuxilios; this.bbsName = 'Gas Pac - Controles generales ambientales y primeros auxilios'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'ELEC'){ this.preguntas = this.gasPacService.electrico; this.bbsName = 'Gas Pac - Eléctrico'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EPCI'){ this.preguntas = this.gasPacService.equipoDeProteccionContraIncendio; this.bbsName = 'Gas Pac - Equipo de protección contra incendio'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EPP'){ this.preguntas = this.gasPacService.equipoDeProteccionPersonal; this.bbsName = 'Gas Pac - Equipo de protección personal'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EGYAC'){ this.preguntas = this.gasPacService.equipoDeGasYAireComprimido; this.bbsName = 'Gas Pac - Equipos de gas y aire comprimido'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'HMPYE'){ this.preguntas = this.gasPacService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Gas Pac - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYADM'){ this.preguntas = this.gasPacService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Gas Pac - Manipulación y almacenamiento de materiales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYHM'){ this.preguntas = this.gasPacService.maquinariaYHerramientasManuales; this.bbsName = 'Gas Pac - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MDS'){ this.preguntas = this.gasPacService.mediosDeSalida; this.bbsName = 'Gas Pac - Medios de salida'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'PDP'){ this.preguntas = this.gasPacService.pruebasDePresion; this.bbsName = 'Gas Pac - Pruebas de presión'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SOYCA'){ this.preguntas = this.gasPacService.saludOcupacionalYControlAmbiental; this.bbsName = 'Gas Pac - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SPCYT'){ this.preguntas = this.gasPacService.superficiesParaCaminarYTrabajar; this.bbsName = 'Gas Pac - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'STYP'){ this.preguntas = this.gasPacService.sustanciasToxicasYPeligrosas; this.bbsName = 'Gas Pac - Sustancias tóxicas y peligrosas'; this.module = 'GembaWalk';
+        
 
-        //Pac Seal
-        }else if(this.formCode == 'CYSDS'){ this.preguntas = this.pacsealService.coloresDeSeguridad; this.bbsName = 'Pac Seal - Colores y señales de seguridad'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CI'){ this.preguntas = this.pacsealService.contraIncendio; this.bbsName = 'Pac Seal - Contra incendio'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CGAYPA'){ this.preguntas = this.pacsealService.controlesGeneralesAmbientalesYPrimerosAuxilios; this.bbsName = 'Pac Seal - Controles generales ambientales y primeros auxilios'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'ELEC'){ this.preguntas = this.pacsealService.electrico; this.bbsName = 'Pac Seal - Eléctrico'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EPP'){ this.preguntas = this.pacsealService.equipoDeProteccionPersonal; this.bbsName = 'Pac Seal - Equipo de protección personal'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EDGCYAC'){ this.preguntas = this.pacsealService.equiposDeGasComprimidoYAireComprimido; this.bbsName = 'Pac Seal - Equipos de gas comprimido y aire comprimido'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'HDMPYE'){ this.preguntas = this.pacsealService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Pac Seal - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYADM'){ this.preguntas = this.pacsealService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Pac Seal - Manipulacion y almacenamiento de materiales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYHM'){ this.preguntas = this.pacsealService.maquinariaYHerramientasManuales; this.bbsName = 'Pac Seal - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MDS'){ this.preguntas = this.pacsealService.mediosDeSalida; this.bbsName = 'Pac Seal - Medios de salida'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SOYCA'){ this.preguntas = this.pacsealService.saludOcupacionalYControlAmbiental; this.bbsName = 'Pac Seal - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SPCYT'){ this.preguntas = this.pacsealService.superficiesParaCaminarYTrabajar; this.bbsName = 'Pac Seal - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'STYPP'){ this.preguntas = this.pacsealService.sustanciasToxicasYPeligrosasPacseal; this.bbsName = 'Pac Seal - Sustancias tóxicas y peligrosas pacseal'; this.module = 'GembaWalk';
-
-        //Planta 52
-        }else if(this.formCode == 'CYSDS'){ this.preguntas = this.plantaService.coloresYSegnalesDeSeguridad; this.bbsName = 'Planta 52 - Colores y señales de seguridad'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CI'){ this.preguntas = this.plantaService.contraIncendio; this.bbsName = 'Planta 52 - Contra incendio'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CAGYPA'){ this.preguntas = this.plantaService.controlesAmbientalesGeneralesYPrimerosAuxilios; this.bbsName = 'Planta 52 - Controles ambientales generales y primeros auxilios'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CSYE'){ this.preguntas = this.plantaService.corteSoldaduraYElectrico; this.bbsName = 'Planta 52 - Corte soldadura y eléctrico'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'ELEC'){ this.preguntas = this.plantaService.electrico; this.bbsName = 'Planta 52 - Eléctrico'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EPP'){ this.preguntas = this.plantaService.equipoDeProteccionPersonal; this.bbsName = 'Planta 52 - Equipo de protección personal'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EDGCYAC'){ this.preguntas = this.plantaService.equiposDeGasComprimidoYAireComprimido; this.bbsName = 'Planta 52 - Equipos de gas comprimido y aire comprimido'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'HDMPYE'){ this.preguntas = this.plantaService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Planta 52 - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYADM'){ this.preguntas = this.plantaService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Planta 52 - Manipulación y almacenamiento de materiales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYHM'){ this.preguntas = this.plantaService.maquinariaYHerramientasManuales; this.bbsName = 'Planta 52 - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MDS'){ this.preguntas = this.plantaService.mediosDeSalida; this.bbsName = 'Planta 52 - Medios de salida'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'PDP'){ this.preguntas = this.plantaService.pruebasDePresion; this.bbsName = 'Planta 52 - Pruebas de presión'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SOYCA'){ this.preguntas = this.plantaService.saludOcupacionalYControlAmbiental; this.bbsName = 'Planta 52 - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SPCYT'){ this.preguntas = this.plantaService.superficiesParaCaminarYTrabajar; this.bbsName = 'Planta 52 - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'STYPP52'){ this.preguntas = this.plantaService.sustanciasToxicasYPeligrosasPlanta52; this.bbsName = 'Planta 52 - Sustancias tóxicas y peligrosas planta52'; this.module = 'GembaWalk';
-
-        //Sistemas auxiliares
-        }else if(this.formCode == 'APPCSI'){ this.preguntas = this.sistemasAuxiliaresService.acabadosPorPulverizacionConSubstanciasInflamables; this.bbsName = 'Sistemas auxiliares - Acabados por pulverización con substancias inflamables'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CYSDS'){ this.preguntas = this.sistemasAuxiliaresService.coloresYSegnalesDeSeguridad; this.bbsName = 'Sistemas auxiliares - Colores y señales de seguridad'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CI'){ this.preguntas = this.sistemasAuxiliaresService.contraIncendio; this.bbsName = 'Sistemas auxiliares - Contra incendio'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CAGYPA'){ this.preguntas = this.sistemasAuxiliaresService.controlesAmbientalesGeneralesYPrimerosAuxilios; this.bbsName = 'Sistemas auxiliares - Controles ambientales generales y primeros auxilios'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'CSYE'){ this.preguntas = this.sistemasAuxiliaresService.corteSoldaduraYElectrico; this.bbsName = 'Sistemas auxiliares - Corte soldadura y eléctrico'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'ELEC'){ this.preguntas = this.sistemasAuxiliaresService.electrico; this.bbsName = 'Sistemas auxiliares - Eléctrico'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EDPP'){ this.preguntas = this.sistemasAuxiliaresService.equipoDeProteccionPersonal; this.bbsName = 'Sistemas auxiliares - Equipo de protección personal'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'EDGCYAC'){ this.preguntas = this.sistemasAuxiliaresService.equiposDeGasComprimidoYAireComprimido; this.bbsName = 'Sistemas auxiliares - Equipos de gas comprimido y aire comprimido'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'HDMPYE'){ this.preguntas = this.sistemasAuxiliaresService.herramientasDeManoPortatilesYElectricas; this.bbsName = 'Sistemas auxiliares - Herramientas de mano portátiles y eléctricas'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYADM'){ this.preguntas = this.sistemasAuxiliaresService.manipulacionYAlmacenamientoDeMateriales; this.bbsName = 'Sistemas auxiliares - Manipulación y almacenamiento de materiales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MYHM'){ this.preguntas = this.sistemasAuxiliaresService.maquinariaYHerramientasManuales; this.bbsName = 'Sistemas auxiliares - Maquinaria y herramientas manuales'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'MDS'){ this.preguntas = this.sistemasAuxiliaresService.mediosDeSalida; this.bbsName = 'Sistemas auxiliares - Medios de salida'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'PDP'){ this.preguntas = this.sistemasAuxiliaresService.pruebasDePresion; this.bbsName = 'Sistemas auxiliares - Pruebas de presión'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SOYCA'){ this.preguntas = this.sistemasAuxiliaresService.saludOcupacionalYControlAmbiental; this.bbsName = 'Sistemas auxiliares - Salud ocupacional y control ambiental'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'SPCYT'){ this.preguntas = this.sistemasAuxiliaresService.superficiesParaCaminarYTrabajar; this.bbsName = 'Sistemas auxiliares - Superficies para caminar y trabajar'; this.module = 'GembaWalk';
-        }else if(this.formCode == 'STYPSA'){ this.preguntas = this.sistemasAuxiliaresService.sustanciasToxicasYPeligrosasSistemasAuxiliares; this.bbsName = 'Sistemas auxiliares - Sustancias tóxicas y peligrosas sistemas auxiliares'; this.module = 'GembaWalk';
-      }
-        this.userAccepted = true;
-        this.notAccepted = false;
-        console.log("RESULT ID ", this.resultId)
-
-        if(this.resultId){
-          this.getQuestions();
+        /*
+        for (let index = 0; index < this.preguntas.length; index++) {
+          this.previsualizacionesGW.push([]);
         }
+
+        this.previsualizacion = this.previsualizacionesGW
+        */
+
 
       },(error)=>{
         this.userAccepted = false;
@@ -658,28 +689,30 @@ export class StampingComponent implements OnInit {
         console.log(error)
       }
     )
-
-
-    
-
-
   }
 
   getQuestions(){
     this.answerService.getAnswersById(this.resultId)
     .subscribe(
       (success)=>{
-        console.log("TENGO LAS RESPUESTAS ANTERIORES")
+        console.log("Success de questions",success)
+
         this.preguntas = success.questions.map( (q:any) => {
           return {
             pregunta: q.description,
             respuesta: q.selection,
             comentarios: q.comments,
-            image: q.image,
+            images: q.images,
             id: q.id
           }
         });
-        console.log("RESPUESTAS ANTERIORES  ",success)
+        for (let i = 0; i < this.preguntas.length; i++) {
+          this.previsualizacion[i] = this.preguntas[i].images
+        }
+
+
+        console.log("preguntas de questions",this.preguntas)
+
         },(error)=>{
         console.log(error)
       }
@@ -687,32 +720,27 @@ export class StampingComponent implements OnInit {
   }
 
 
-  functionFirstTime(index:any){
-    console.log("Se guardan los datos", index)
+  updateAnswers(index:any){
+    console.log("Preguntas con id",this.preguntas)
     for (let index = 0; index < this.preguntas.length; index++) {
       if(!this.preguntas[index].id){
         this.primeraVez = true;
-        console.log("Indice del primeraVez true",index)
       }else{
         this.primeraVez = false;
-        console.log("Indice del primeraVez false",index);
         break;
       }
     }
-
-    //Subir un post de la primer pregunta que se contestó
+    //Subir un post de las primeras preguntas que se contestó
+    this.answersArray = [];
     for(let i = 0; i<this.preguntas.length; i++){
       this.answersArray.push(
         {
           description: this.preguntas[i].pregunta,
           selection: this.preguntas[i].respuesta,
           comments: this.preguntas[i].comentarios,
-          image: this.preguntas[i].image
+          image: this.previsualizacion[i]
         });
     }
-
-    
-    console.log(this.primeraVez)
 
     if(this.primeraVez){   
       const answers = {
@@ -721,13 +749,9 @@ export class StampingComponent implements OnInit {
         image: this.respuestas.image,
         questions: this.answersArray
       }
-
-      console.log("POST",answers)
       this.answerService.addAnswer(answers)
       .subscribe(
         (success)=>{
-          console.log("POST EXITOSO")
-          console.log("Aqui deberia venir el result Id",success)
           this.resultId = success.id;
           this.getQuestions();
         },(error)=>{
@@ -735,26 +759,37 @@ export class StampingComponent implements OnInit {
         }
       )      
     }else{
-      console.log("UPDATE")
-      console.log(this.preguntas[index])
       const questionId = this.preguntas[index].id
-      console.log("questionId",questionId)
       const answersUpdate = {
         resultId: this.resultId,
         description: this.preguntas[index].pregunta,
         selection: this.preguntas[index].respuesta,
         comments: this.preguntas[index].comentarios,
-        image: this.preguntas[index].image
       }
+      const imagesUpdate = {
+        images: this.previsualizacion[index]
+      }
+      this.answerService.updateImages(imagesUpdate,questionId)
+      .subscribe(
+        (success)=>{
+          console.log(success)
+        },(error)=>{
+          console.log(error)
+        }
+      )
       this.answerService.updateAnswer(answersUpdate,questionId)
       .subscribe(
         (success)=>{
-          console.log("UPDATE EXITOSO",success)
+          console.log(success)
         },(error)=>{
           console.log(error)
         }
       )
     }
+  }
+
+  eliminarElemento(elemento:any){
+    this.previsualizacion[this.selectedQuestion].splice(elemento,1);
   }
 
   functionYes(index:any){
@@ -783,13 +818,39 @@ export class StampingComponent implements OnInit {
     }
   }
 
-  captureFile(event:any):any{
+  
+  extraerBase64 = async ($event: any) => new Promise((resolve) => {
+    try{
+      const unsafeImg = window.URL.createObjectURL($event);
+      const image = this.sanitizer.bypassSecurityTrustUrl(unsafeImg);
+      const reader = new FileReader();
+      reader.readAsDataURL($event);
+        reader.onload = () =>{
+          resolve({
+            base: reader.result
+          });
+        };
+        reader.onerror = error =>{
+          resolve({
+            base: null
+          });
+        };
+        return
+      }catch (e) {
+        return null;
+      }
+    })
+
+  captureFile(event:any):any{   
+    console.log("capture file") 
     const archivoCapturado = event.target.files[0]
     this.extraerBase64(archivoCapturado).then(async (imagen:any) => {
       var smallImage = await reduceImageSize(imagen.base);
-      this.previsualizacion[this.selectedQuestion] = smallImage;
-      this.preguntas[this.selectedQuestion].image = smallImage;
-      console.log(this.previsualizacion)
+      this.previsualizacionesGW[this.selectedQuestion].push(smallImage);
+      this.previsualizacion[this.selectedQuestion] = this.previsualizacionesGW[this.selectedQuestion];
+      this.preguntas[this.selectedQuestion].images = this.previsualizacionesGW[this.selectedQuestion];
+
+      console.log("PREVISUALIZACION SELECTED QUESTION",this.previsualizacion[this.selectedQuestion])
       if(this.module == 'BBS'){
         this.preguntas[this.preguntas.length-1].respuesta = true;
       }      
@@ -806,62 +867,8 @@ export class StampingComponent implements OnInit {
     this.archivos.push(archivoCapturado);
   }
 
-  extraerBase64 = async ($event: any) => new Promise((resolve) => {
-  try{
-    const unsafeImg = window.URL.createObjectURL($event);
-    const image = this.sanitizer.bypassSecurityTrustUrl(unsafeImg);
-    const reader = new FileReader();
-    reader.readAsDataURL($event);
-      reader.onload = () =>{
-        resolve({
-          base: reader.result
-        });
-      };
-      reader.onerror = error =>{
-        resolve({
-          base: null
-        });
-      };
-      return
-    }catch (e) {
-      return null;
-    }
-  })
-
-  //Si es la primera vez que contesto una pregunta 
-  //POST api/results
-  //Status en proceso 
-
-  //Cada que se conteste una pregunta, actualizar las respuestas que tenga, y las que no, ponerlas como undefined (selection e image)
-  // PUT a api/questions/questionId
-  /* 
-    public Guid ResultId { get; set; }
-    public string? Description { get; set; }
-    public bool? Selection { get; set; }
-    public string? Comments { get; set; }
-    public string? Image { get; set; }
-  */
-
-  //Para traer todas las preguntas con respuestas
-  //GET BY ID api/results -> resultId
-  /* 
-    public record QuestionDto
-    {
-        public Guid Id { get; init; }  <- questionId
-        public Guid ResultId { get; set; }
-        public string? Description { get; set; }
-        public bool? Selection { get; set; }
-        public string? Comments { get; set; }
-        public string? Image { get; set; }
-    }
-  */
-
-  //Al terminar el formulario y oprimir TERMINAR, actualizar el status a Completado en
-  //PUT api/events/{guid}/status
-
-
   enviar(){
-
+    this.updateAnswers(this.selectedQuestion);
     this.answerService.updateStatusToComplete("Completado",this.eventId)
     .subscribe(
       (success)=>{
@@ -875,8 +882,9 @@ export class StampingComponent implements OnInit {
     this.spinnerService.show();
     this.spinnerService.hide();
   }
-}
 
+
+}
 
 async function reduceImageSize(base64Str:string, MAX_WIDTH = 450, MAX_HEIGHT = 450): Promise<string>{
   let resized_base64:string = await new Promise((resolve) => {

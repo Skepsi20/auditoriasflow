@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./ensamble-p62.component.css']
 })
 export class EnsambleP62Component implements OnInit {
-
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'La operadora está usando correctamente y completo su EPP (guantes anticorte, lentes, tapones, botas)',
@@ -181,5 +184,5 @@ export class EnsambleP62Component implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

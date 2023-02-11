@@ -26,7 +26,7 @@ export class PacSealService {
       image: ''
     },
     {
-      pregunta: 'Se encuentra el área saturada por señales de seguridad de manera que pueda generar alguna confusión o mala información',
+      pregunta: 'Las señales de seguridad se encuentran libres de manera que puedan ser observadas y no sea disminuida o eliminada la eficacia de estas',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -214,7 +214,7 @@ export class PacSealService {
       image: ''
     },
     {
-      pregunta: '¿Se pueden soltar fácilmente los extintores?',
+      pregunta: '¿Los extintores se encuentran correctamente sujetos a la pared o a un contenedor de manera que no puedan caerse?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -362,12 +362,12 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Los cables flexibles y los cables nunca sustituyen al cableado fijo?',
+      pregunta: '¿Solo se encuentran conectados los equipos con cables permanentes, sin utilizar extensiones temporales?',
       respuesta: undefined,
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Los cables y cordones flexibles sin protección no pasan a través de los agujeros en las paredes o el techo o a través de puertas o ventanas?',
+      pregunta: '¿Los cables y cordones flexibles sin protección están correctamente colocados y no pasan a través de agujeros en las paredes o el techo o a través de puertas o ventanas?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -416,12 +416,12 @@ export class PacSealService {
   ]
   public equipoDeProteccionPersonal: Array<any> = [
     {
-      pregunta: '¿Se utiliza y se hace cumplir el equipo de protección personal cuando es necesario?',
+      pregunta: '¿El personal cumple con el uso de Equipo de protección personal cuando es necesario?',
       respuesta: undefined,
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Están los empleadores manteniendo adecuadamente el PPE como se requiere?',
+      pregunta: '¿Están los empleadores manteniendo adecuadamente el equipo de proteccion personal como se requiere?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -484,7 +484,7 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Tienen alguna reparación o modificación que no sea de fabrica los punzones y cinceles?',
+      pregunta: '¿Están en buenas condiciones las cabezas en forma de hongo de los cinceles o punzones?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -618,7 +618,7 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Las eslingas se retiran del servicio cuando se presenta alguno de los siguientes?',
+      pregunta: '¿Las eslingas se retiran del servicio cuando se presenta algun daño o desgaste en ellas?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -869,7 +869,7 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿La altura más baja del techo en cualquier área de trabajo es no menor a 2.5 metros u 8 pies, 3 pulgadas? Si la respuesta es No, consulte los requisitos especiales',
+      pregunta: '¿La altura del techo en cualquier área de trabajo es mayor a 2.5 metros u 8 pies, 3 pulgadas?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -1009,7 +1009,7 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Todos los pasillos y plataformas elevados tienen barandas o barandas de al menos 90 centímetros (3 pies) de altura? (Solo requerido para plataformas donde hay trabajadores presentes).',
+      pregunta: '¿Todos los pasillos y plataformas elevados tienen  barandas de al menos 90 centímetros (3 pies) de altura? (Solo requerido para plataformas donde hay trabajadores presentes)..',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -1028,7 +1028,7 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿El plomo está presente en alguna forma dentro de la planta (es decir, compuesto antiagarrotamiento, pigmento de plomo en la pintura, bronce con plomo o aluminio con plomo?',
+      pregunta: '¿El plomo está ausente de la planta (es decir, compuesto antiagarrotamiento, pigmento de plomo en la pintura, bronce con plomo o aluminio con plomo?',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -1093,7 +1093,7 @@ export class PacSealService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Se han identificado áreas donde se han identificado exposiciones a sustancias peligrosas con señales muy notorias?',
+      pregunta: '¿Se han identificado las áreas  con exposicion a sustancias peligrosas con señales muy notorias?',
       respuesta: undefined,
       comentarios: '',
       image: ''

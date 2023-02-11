@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./soldadura.component.css']
 })
 export class SoldaduraComponent implements OnInit {
-
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador está usando correctamente y completo su EPP (guantes, careta, mandil, lentes, tapones y botas)',
@@ -191,5 +194,5 @@ export class SoldaduraComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

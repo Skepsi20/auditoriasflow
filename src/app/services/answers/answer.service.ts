@@ -37,11 +37,16 @@ export class AnswerService {
       description: answerRequest.description,
       selection: answerRequest.selection,
       comments: answerRequest.comments,
-      image: answerRequest.image
     };
     return this.httpClient.put<any>(this.baseApiUrl+'/api/questions/'+questionId,body);
   }
 
+  updateImages(answerRequest: any, questionId: string):Observable<any>{
+    const body: any={
+      images: answerRequest.images
+    };
+    return this.httpClient.put<any>(this.baseApiUrl+'/api/questions/'+questionId+'/images',body);
+  }
     //PUT api/events/{guid}/status
 
   updateStatusToComplete(status: string, eventId: string):Observable<any>{

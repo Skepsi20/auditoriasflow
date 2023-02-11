@@ -166,7 +166,7 @@
           <h2>Imágenes</h2>
           <div *ngFor="let image of todasLasImagenes">
             <div class="col-4" style="float:left">
-              <div class="card text-center" align="center" style=" margin-bottom: 30px; ">
+              <div class="card text-center situacionesRiesgosas" align="center" style=" margin-bottom: 30px; ">
                 <div class="card-header" style="height: 60px;">
                   <h5>Auditor: {{image.auditor}}</h5>
                 </div>
@@ -187,14 +187,14 @@
         </div>
       </div>
       <div class="row mb-4" *ngIf="modulo == 'BBS'">
-        <div class="col" align="center" >
+        <div class="col" align="center">
           <h2>Situaciones de riesgo</h2>
-          <div *ngFor="let image of arregloImagenes">
+          <div *ngFor="let image of todasLasImagenes">
             <div class="col-4" style="float:left" *ngIf="image.image">
-              <div class="card text-center" align="center" style=" margin-bottom: 30px; ">
+              <div class="card text-center situacionesRiesgosas" align="center">
                 <div class="card-header" style="height: 60px;">
                   <div class="col">
-                    {{image.employee}}: {{image.form}}
+                    {{image.auditor}}: {{image.auditoria}}
                   </div>
                 </div>
                 <div class="card-body">
@@ -202,11 +202,11 @@
                     <img [src]="image.image" class="image">
                   </div>
                   <div class="row" style="text-align:center; margin-top:10px;">
-                    <p style="height: 100px; overflow: scroll;">{{image.comments}}</p>
+                    <p style="height: 100px; overflow: scroll;">{{image.comentarios}}</p>
                   </div>
                 </div>
                 <div class="card-footer text-muted">
-                  Fecha: {{image.period | date: "fullDate":"":"es"}}
+                  Fecha: {{image.fecha | date: "fullDate":"":"es"}}
                 </div>
               </div>
             </div>

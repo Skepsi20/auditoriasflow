@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./rubber-molding.component.css']
 })
 export class RubberMoldingComponent implements OnInit {
-
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador está usando correctamente y completo su EPP (guantes anticorte, lentes, tapones, botas)',
@@ -181,5 +184,5 @@ export class RubberMoldingComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

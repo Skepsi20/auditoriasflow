@@ -9,8 +9,14 @@ import { answerDetail } from 'src/app/models/answer.model';
   templateUrl: './torno-manual.component.html',
   styleUrls: ['./torno-manual.component.css']
 })
+
+
 export class TornoManualComponent implements OnInit {
 
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador está usando correctamente y completo su EPP (lentes, tapones y botas), valide que cuando el operador esté en contacto con la pieza en movimiento no utilice guantes',
@@ -42,7 +48,7 @@ export class TornoManualComponent implements OnInit {
   public respuestas: answer = {
     eventId: '',
     assignedTo: '',
-    image: '',
+    image: [''],
     questions: [{
       description: '',
       selection: false,
@@ -83,7 +89,7 @@ export class TornoManualComponent implements OnInit {
     this.preguntas[index].respuesta = true;
     var answered = 0;
     for (let i = 0; i < this.preguntas.length-1; i++) {
-      if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
+      if(this.preguntas[i].respuesta == undefined || !this.respuestas.image){
         answered ++;
       }if(answered == 0){
         this.formReady = true;
@@ -95,7 +101,7 @@ export class TornoManualComponent implements OnInit {
     this.preguntas[index].respuesta = false;
     var answered = 0;
     for (let i = 0; i < this.preguntas.length-1; i++) {
-      if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
+      if(this.preguntas[i].respuesta == undefined || !this.respuestas.image){
         answered ++;
       }if(answered == 0){
         this.formReady = true;
@@ -111,7 +117,7 @@ export class TornoManualComponent implements OnInit {
       this.preguntas[this.preguntas.length-1].respuesta = true;
       var answered = 0;
       for (let i = 0; i < this.preguntas.length-1; i++) {
-        if(this.preguntas[i].respuesta == undefined || this.respuestas.image == ''){
+        if(this.preguntas[i].respuesta == undefined || !this.respuestas.image){
           answered ++;
         }if(answered == 0){
           this.formReady = true;
@@ -171,5 +177,5 @@ export class TornoManualComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

@@ -16,6 +16,11 @@ export class FormsService {
     return this.httpClient.get<any[]>(this.baseApiUrl + '/api/forms/');
   }
 
+  getFormById(id:any): Observable<any[]>{
+    return this.httpClient.get<any[]>(this.baseApiUrl + '/api/forms/'+id);
+  }
+
+
   getFormByYear(request: any): Observable<any[]>{
     const body:any = {
       id: request.id,

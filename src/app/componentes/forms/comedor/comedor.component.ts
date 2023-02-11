@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./comedor.component.css']
 })
 export class ComedorComponent implements OnInit {
-  public preguntas: Array<any> = [
+  ngOnInit(): void {
+    
+  }
+ /*  public preguntas: Array<any> = [
     {
       pregunta: 'El operador está utilizando correctamente y completo su EPP (zapato antiderrapante, cofia, cubrebocas, guantes y mandil)',
       respuesta: undefined,
@@ -175,5 +178,5 @@ export class ComedorComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

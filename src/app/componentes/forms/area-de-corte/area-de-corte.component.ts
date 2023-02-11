@@ -10,7 +10,10 @@ import { answerDetail } from 'src/app/models/answer.model';
   styleUrls: ['./area-de-corte.component.css']
 })
 export class AreaDeCorteComponent implements OnInit {
-
+  ngOnInit(): void {
+    
+  }
+/* 
   public preguntas: Array<any> = [
     {
       pregunta: 'El operador está usando correctamente y completo su EPP (lentes, casco, guantes, tapones, botas)',
@@ -181,5 +184,5 @@ export class AreaDeCorteComponent implements OnInit {
       )
 
     console.log("RESPUESTAS", this.preguntas)
-  }
+  } */
 }

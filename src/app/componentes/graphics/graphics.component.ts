@@ -17,7 +17,7 @@ registerLocaleData(myLocaleEs);
 })
 export class GraphicsComponent implements OnInit {
   filter = {
-    year:2022,
+    year:2023,
     form:{
       code:'',
       name:'',
@@ -60,6 +60,7 @@ export class GraphicsComponent implements OnInit {
   acumuladoNo:Array<any> = [];
   labels:Array<any> = [];
   graficsReady = false;
+  preguntasOrdenadas: Array<any> = [];
 
   constructor(
     private formsService: FormsService,
@@ -208,7 +209,16 @@ export class GraphicsComponent implements OnInit {
     this.formsService.getFormByYearandFiltered(this.request)
     .subscribe(
       (success)=>{
-        console.table("LA MAMADA QUE QUIERE OMAR",success)
+
+        console.log("DATOS DEL SERVICIO",success)
+        this.preguntasOrdenadas = [...success];
+        this.preguntasOrdenadas.sort(((a, b) => a.index - b.index))
+        
+        console.log("DATOS DEL SERVICIO ORDENADOS",this.preguntasOrdenadas)
+
+
+
+
 
         for (let index = 0; index < success.length; index++) {
           var item = success[index];
@@ -233,13 +243,14 @@ export class GraphicsComponent implements OnInit {
         var arregloNo = [];
         var total = 0;
         var porcentaje = 0;
-        var image64:any
+        var image64:Array<any> = [];
         arregloDatos.sort(((a, b) => b.negativeCounter - a.negativeCounter))
 
-        for (let index = 0; index < arregloDatos.length-1; index++) {
-          var item = arregloDatos[index];
-          this.acumuladoSi.push(arregloDatos[index].positiveCounter)
-          this.acumuladoNo.push(arregloDatos[index].negativeCounter)
+        //Acumulado de datos SI Y NO 
+        for (let index = 0; index < this.preguntasOrdenadas.length-1; index++) {
+          var item = this.preguntasOrdenadas[index];
+          this.acumuladoSi.push(this.preguntasOrdenadas[index].positiveCounter)
+          this.acumuladoNo.push(this.preguntasOrdenadas[index].negativeCounter)
           this.labels.push("Pregunta: "+(item.index))
         }        
 
@@ -247,23 +258,36 @@ export class GraphicsComponent implements OnInit {
               //METER TODAS LAS IMAGENES EN UN ARREGLO
               for (let index = 0; index < arregloDatos.length; index++) {
                 for (let j = 0; j < arregloDatos[index].details.length; j++) {
-                  if(arregloDatos[index].details[j].image){
-                    this.todasLasImagenes.push({
-                      image:arregloDatos[index].details[j].image,
-                      auditor: arregloDatos[index].details[j].employee.firstName +' '+ arregloDatos[index].details[j].employee.lastName,
-                      auditoria: arregloDatos[index].details[j].event.name,
-                      fecha:  arregloDatos[index].details[j].creationDateTime,
-                      descripcion: arregloDatos[index].questionDescription,
-                      comentarios: arregloDatos[index].details[j].comments,
-                    });
+
+                  if(arregloDatos[index].details[j].images.length){
+                    console.log("IMAGENES EN EL FOR ",arregloDatos[index].details[j])
+                  }
+
+                  if(arregloDatos[index].details[j].images.length){
+                    for (let k = 0; k < arregloDatos[index].details[j].images.length; k++) {
+                      this.todasLasImagenes.push({
+                        image:arregloDatos[index].details[j].images[k],
+                        auditor: arregloDatos[index].details[j].employee.firstName +' '+ arregloDatos[index].details[j].employee.lastName,
+                        auditoria: arregloDatos[index].details[j].event.name,
+                        fecha:  arregloDatos[index].details[j].creationDateTime,
+                        descripcion: arregloDatos[index].questionDescription,
+                        comentarios: arregloDatos[index].details[j].comments,
+                      });
+                    }                    
                   }
     
                 }                
               }
 
+              console.log("TODAS LAS IMAGENES",this.todasLasImagenes)
         for (let index = 0; index < arregloDatos.length; index++) {
+
+
+          console.log("Arreglo de datos details",arregloDatos[index].details)
+
           if(index == arregloDatos.length-1){
             for (let i = 0; i < arregloDatos[index].details.length; i++) {
+              image64 = [];
               const imageDefault = this.imageService.getImage()
               var imageToShow: any;
               if(arregloDatos[index].details[i].employee.profileImage == null){
@@ -279,9 +303,11 @@ export class GraphicsComponent implements OnInit {
                   date: arregloDatos[index].details[i].creationDateTime
                 }
               )
+              
 
-              image64 = arregloDatos[index].details[i].image;
-              if(image64 != 'No image' || image64){
+              /* image64.push(arregloDatos[index].details[i].images);
+              console.log("IMAGEN 64",i,'INDEX',image64.length)
+              if(image64[0].length > 0){
                 this.arregloImagenes.push({
                   image: image64,
                   comments: arregloDatos[index].details[i].comments,
@@ -289,9 +315,11 @@ export class GraphicsComponent implements OnInit {
                   employee: arregloDatos[index].details[i].employee.firstName +' '+ arregloDatos[index].details[i].employee.lastName,
                   period: arregloDatos[index].details[i].creationDateTime
                 })         
-              }
+              } */
             }
           }
+
+          console.log("ARREGLO DE IMAGENES ", this.arregloImagenes)
 
           total = arregloDatos[index].negativeCounter + total;
           arregloPreguntas.push(arregloDatos[index].questionDescription)
@@ -304,12 +332,10 @@ export class GraphicsComponent implements OnInit {
             }
           }
           this.commentsArray[index] = {
-            question: arregloDatos[index].questionDescription,
+            question: this.preguntasOrdenadas[index].questionDescription,
             respuestas: arregloComentarios,
-            image: arregloDatos[index].details[0].image
+            image: this.preguntasOrdenadas[index].details[0].image
           }
-          console.log(arregloDatos[index].details[0].image)
-          console.log(this.commentsArray)
           arregloComentarios = [];
         }
 
