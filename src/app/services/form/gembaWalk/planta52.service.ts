@@ -18,7 +18,7 @@ export class Planta52Service {
       comentarios: '',
       image: ''
     },{
-      pregunta: 'Se encuentra alguna señal de seguridad dañada, rota o en malas condicones',
+      pregunta: 'Se encuentran las señales de seguridad en buenas condiciones, sin presentar algun daño o deterioro',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -1150,7 +1150,7 @@ export class Planta52Service {
       comentarios: '',
       image: '',
     },{
-      pregunta: '¿Todos los pasillos y plataformas elevados tienen  barandas de al menos 90 centímetros (3 pies) de altura? (Solo requerido para plataformas donde hay trabajadores presentes).',
+      pregunta: '¿Todos los pasillos y plataformas elevados tienen barandas de al menos 90 centímetros (3 pies) de altura? (Solo requerido para plataformas donde hay trabajadores presentes)',
       respuesta: undefined,
       comentarios: '',
       image: '',
@@ -1234,7 +1234,7 @@ export class Planta52Service {
       comentarios: '',
       image: '',
     },{
-      pregunta: '¿Se han identificado las áreas  con exposicion a sustancias peligrosas con señales muy notorias?',
+      pregunta: '¿Se han identificado las áreas con exposicion a sustancias peligrosas con señales muy notorias?',
       respuesta: undefined,
       comentarios: '',
       image: '',

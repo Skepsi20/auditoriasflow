@@ -7,6 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ImageServiceService } from 'src/app/services/image-service.service';
 import myLocaleEs from '@angular/common/locales/es'
 import {registerLocaleData} from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 registerLocaleData(myLocaleEs);
 
@@ -44,6 +45,8 @@ export class GraphicsComponent implements OnInit {
   request:any 
   pdfReport:string = '';
   csvReport:string = '';
+  elementoAEliminar = '';
+  correctoDOM = false;
 
   formsByModule: Array<any> = [];
   gembaSelected = false;
@@ -65,6 +68,7 @@ export class GraphicsComponent implements OnInit {
   constructor(
     private formsService: FormsService,
     private spinnerService: SpinnerService,
+    private snackbar: MatSnackBar,
     private _sanitizer: DomSanitizer,
     private imageService: ImageServiceService
 
@@ -190,6 +194,39 @@ export class GraphicsComponent implements OnInit {
       this.botonBuscarGraficos = false;
     }
   }
+  
+  correct(){
+    console.log("CORRECTO")
+    this.correctoDOM = true;
+    setTimeout(()=>{
+      this.correctoDOM = false;
+    }, 1000);
+  }
+
+  eliminarResultado(id:any){
+    this.elementoAEliminar = id;
+    console.log("Elemento a eliminar",id)
+  }
+
+  deleteConfirmation(){
+    console.log("Confirmacion de eleminado",this.elementoAEliminar)
+    
+    this.formsService.deleteResult(this.elementoAEliminar)
+    .subscribe(
+      (success)=>{
+        this.snackbar.open('Contraseña actualizada',undefined,{
+          duration: 2000
+        });
+       console.log(success)
+      },(error)=>{
+        this.snackbar.open('Error actualizando la contraseña',undefined,{
+          duration: 2000
+        });
+        console.log(error)
+      }
+    )
+  }
+
 
   preparacionDeGraficos(){
     this.request = {

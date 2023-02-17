@@ -67,7 +67,7 @@ export class SistemasAuxiliaresService {
       comentarios: '',
       image: ''
     },{
-      pregunta: 'Se encuentra alguna señal de seguridad dañada, rota o en malas condicones',
+      pregunta: 'Se encuentran las señales de seguridad en buenas condiciones, sin presentar algun daño o deterioro',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -1278,7 +1278,7 @@ export class SistemasAuxiliaresService {
       comentarios: '',
       image: ''
     },{
-      pregunta: '¿Se han identificado las áreas  con exposicion a sustancias peligrosas con señales muy notorias?',
+      pregunta: '¿Se han identificado las áreas con exposicion a sustancias peligrosas con señales muy notorias?',
       respuesta: undefined,
       comentarios: '',
       image: ''

@@ -7,6 +7,19 @@
   </div>
 </div>
 
+<div class="container" *ngIf="firstTimeDom && userAccepted">
+  <div class="card mt-5 text-center" style="width: 60%; margin:0px auto;">
+    <h5 class="card-header">Auditado</h5>
+    <div class="card-body">
+      <h5 class="card-title">Nombre de la persona o personas a auditar</h5>
+      <input type="text" class="form-field" placeholder="Auditado" matInput [(ngModel)]="auditado" style="width: 100%;"><br>
+    </div>
+    <div class="card-footer">
+      <a class="btn btn-success" style="color:white;" (click)="primera()">Continuar</a>
+    </div>
+  </div>
+</div>
+
 <div class="container" *ngIf="!userAccepted">
   <div class="card mt-5 text-center" style="width: 60%; margin:0px auto;">
     <h5 class="card-header">Sistema de auditorías Flowserve Tlaxcala</h5>
@@ -24,7 +37,7 @@
 </div>
 
 
-<div class="container" *ngIf="userAccepted && !formFinished">
+<div class="container" *ngIf="userAccepted && !formFinished && !firstTimeDom">
   <div class="row">
     <div class="card col-10 text-white mb-3" style="margin: 0px auto; text-align: center; background-color: #E2231A;">
       <div class="card-header">
@@ -33,9 +46,6 @@
       </div>
     </div>
   </div>
-
-
-
 
   <div class="row">
     <div class="card col-10 border-danger mb-3" style="min-height: 420px; margin: 0px auto;box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;">
@@ -49,7 +59,6 @@
           </div>
         </div>
       </div>
-
 
       <div class="card-body" style="padding-left: 0px !important; padding-right: 0px !important;">
         <h5 class="card-title">

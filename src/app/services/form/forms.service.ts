@@ -20,6 +20,10 @@ export class FormsService {
     return this.httpClient.get<any[]>(this.baseApiUrl + '/api/forms/'+id);
   }
 
+  
+  deleteResult(id:any): Observable<any[]>{
+    return this.httpClient.delete<any[]>(this.baseApiUrl + '/api/results/'+id);
+  }
 
   getFormByYear(request: any): Observable<any[]>{
     const body:any = {

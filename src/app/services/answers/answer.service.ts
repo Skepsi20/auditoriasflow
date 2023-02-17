@@ -23,10 +23,11 @@ export class AnswerService {
   }
 
   addAnswer(answerRequest: any): Observable<any>{
-    const body: answer={
+    const body: any={
       eventId: answerRequest.eventId,
       assignedTo: answerRequest.assignedTo,
-      questions: answerRequest.questions
+      questions: answerRequest.questions,
+      audited: answerRequest.audited
     };
     return this.httpClient.post<answer>(this.baseApiUrl+'/api/results/',body);
   }
