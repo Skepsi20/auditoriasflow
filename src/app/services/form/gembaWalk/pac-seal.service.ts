@@ -38,7 +38,7 @@ export class PacSealService {
       image: ''
     },
     {
-      pregunta: 'Las tuberías se identifican con el color de seguridad según corresponda: Rojo: Identificación de fluidos conducidos por tubeía para el combate de incendios, Amarillo: Identificación de fluidos peligrosos conducidos por tubería, Verde: Identificación de fluidos NO peligrosos conducidos por tubería',
+      pregunta: 'Las tuberías se identifican con el color de seguridad según corresponda: Rojo: Identificación de fluidos conducidos por tubería para el combate de incendios, Amarillo: Identificación de fluidos peligrosos conducidos por tubería, Verde: Identificación de fluidos NO peligrosos conducidos por tubería',
       respuesta: undefined,
       comentarios: '',
       image: ''
@@ -52,7 +52,7 @@ export class PacSealService {
   ]
   public contraIncendio: Array<any> = [
     {
-      pregunta: '¿Están todas las barreras contra incendio intactas y están cerradas todas las barreras?',
+      pregunta: '¿Están todos los hidrantes despejados y libres de obstrucción para que se puedan usar en caso de ser necesario?',
       respuesta: undefined,
       comentarios: '',
       image: ''
