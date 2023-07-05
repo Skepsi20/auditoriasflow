@@ -1,0 +1,341 @@
+<div class="contenedor" style="padding-bottom:4rem; padding-top: 2rem;">
+    <div class="row" style="border-bottom: 2px solid red; width: 100%; padding: 5px; background-color: white;">
+        <div class="col">
+            <h3 style="
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                ">INCIDENCIAS</h3>
+        </div>
+        <div class="col">
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Módulo</mat-label>
+                <mat-select [(ngModel)]="modulo" name="modulo" (ngModelChange)="checkModule(1)">
+                    <mat-option *ngFor="let module of modules" [value]="module">
+                    {{module}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col" *ngIf="areaDom">
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Área</mat-label>
+                <mat-select [(ngModel)]="area" name="area" (ngModelChange)="checkModule(0)">
+                    <mat-option *ngFor="let area of areas" [value]="area">
+                    {{area}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col" *ngIf="filtro">
+            <button class="btn btn-dark" (click)="cargar()"  style="
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            ">Buscar</button>
+        </div>
+    </div>
+    <app-spinner></app-spinner>
+    <div style="text-align: center; border-radius: 5px; margin-top: 2em; padding: 5px; padding-bottom: 3em; margin-bottom: 30em;">
+        <div class="row">
+            <h2 *ngIf="showInfo" style="margin-top: 0.5em;">TOTAL DE INCIDENCIAS</h2>
+
+            <div class="row" *ngIf="modulo != 'Todas'">
+                <div class="col" style="text-align: center;">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="dChart" style="margin: 0px auto;"></canvas>
+                        </div>
+                    </div>            
+                </div>
+            </div>
+
+            <div class="row" *ngIf="modulo == 'Todas'">
+                <div class="col" style="text-align: center;">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="dChart1" style="margin: 0px auto;"></canvas>
+                        </div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col">
+                            <h4 *ngIf="showInfo && modulo == 'Todas'">BBS</h4>
+                        </div>
+                    </div>
+                </div>     
+                <div class="col" style="text-align: center;">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="dChart2" style="margin: 0px auto;"></canvas>
+                        </div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col">
+                            <h4 *ngIf="showInfo && modulo == 'Todas'">GEMBA WALK</h4>
+                        </div>
+                    </div>
+                </div>            
+            </div>
+
+
+            <!-- <div class="col" style="text-align: center;">
+                <canvas id="dChart" style="margin: 0px auto;"></canvas>
+            </div>   -->      
+        </div>
+        <div class="row" *ngIf="showInfo">
+
+            <div class="col" style="text-align: center; margin-top: 2em;" *ngIf="modulo == 'Todas'">
+
+                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table" style="margin: 0px auto;">
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef> Status </th>
+                        <td mat-cell *matCellDef="let element">
+                            <div *ngIf="element.status == 'En proceso'" style="color: orange;">
+                                <p>{{element.status}}</p>
+                            </div>
+                            <div *ngIf="element.status == 'Pendiente'" style="color: red;">
+                                <p>{{element.status}}</p>
+                            </div>
+                            <div *ngIf="element.status == 'Terminado'" style="color: green;">
+                                <p>{{element.status}}</p>
+                            </div> 
+                        </td>
+                    </ng-container>              
+                    <ng-container matColumnDef="modulo">
+                        <th mat-header-cell *matHeaderCellDef> Módulo </th>
+                        <td mat-cell *matCellDef="let element"> {{element.modulo}} </td>
+                    </ng-container>                                  
+                    <ng-container matColumnDef="area">
+                        <th mat-header-cell *matHeaderCellDef> Área </th>
+                        <td mat-cell *matCellDef="let element"> {{element.area}} </td>
+                    </ng-container>              
+                    <ng-container matColumnDef="total">
+                        <th mat-header-cell *matHeaderCellDef> Total de incidencias </th>
+                        <td mat-cell *matCellDef="let element"> {{element.total}} </td>
+                    </ng-container>           
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>                     
+            </div>      
+        </div>
+        
+        <div class="row" *ngIf="showInfo">
+            <div class="col" style="text-align: center; margin-top: 2em;" *ngIf="modulo != 'Todas'">
+                <table mat-table [dataSource]="moduleSource" class="mat-elevation-z8 demo-table" style="margin: 0px auto; width: 100%;">
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef style="width: auto;"> Status </th>
+                        <td mat-cell *matCellDef="let element">
+                            
+                            <div style="color: green;" *ngIf="element.status == 'Terminado'">
+                                <p style="font-size: 16px;">{{element.status}}</p>
+                            </div>
+                            <div style="color: red" *ngIf="element.status == 'Pendiente'">
+                                <p style="font-size: 16px;">{{element.status}}</p>
+                            </div>
+                            <div style="color: orange" *ngIf="element.status == 'En proceso'">
+                                <p style="font-size: 16px;">{{element.status}}</p>
+                            </div>
+                            <!-- 
+                            <div class="cardTerminado" *ngIf="element.status == 'Terminado'">{{element.status}}</div>
+                            <div class="cardPendiente" *ngIf="element.status == 'Pendiente'">{{element.status}}</div>
+                            <div class="cardProceso" *ngIf="element.status == 'En proceso'">{{element.status}}</div>
+                         -->
+                        </td>
+                    </ng-container>  
+                    <ng-container matColumnDef="acciones">
+                        <th mat-header-cell *matHeaderCellDef style="width: auto;"> Acciones </th>
+                        <td mat-cell *matCellDef="let element">
+                            <div *ngIf="element.status == 'Pendiente'">
+                                <button class="cardTerminado checkTerminado" data-toggle="modal" data-target="#iniciarModal">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-indent" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3 8a.5.5 0 0 1 .5-.5h6.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H3.5A.5.5 0 0 1 3 8Z"/>
+                                        <path fill-rule="evenodd" d="M12.5 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5Z"/>
+                                      </svg> Iniciar</button><br>
+                                <button class="cardProceso checkEditar" data-toggle="modal" data-target="#editModal" (click)="asignarValores(element.notas, element.owner)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                      </svg> Editar</button>
+                            </div>
+                            <div *ngIf="element.status == 'En proceso'">
+                                <button class="cardTerminado checkProceso" data-toggle="modal" data-target="#terminarModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+                                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                    </svg> Terminar</button><br>
+                                <button class="cardProceso checkEditar" data-toggle="modal" data-target="#editModal" (click)="asignarValores(element.notas, element.owner)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                      </svg> Editar</button>
+                            </div>
+                        </td>
+                    </ng-container>              
+                    <ng-container matColumnDef="fecha1">
+                        <th mat-header-cell *matHeaderCellDef style="width: 10%;"> Fecha Inicio </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span><b>Fecha de inicio:</b><br> {{element.fecha1 | date: "mediumDate":"":"es"}}</span><br><br>
+                            <span><b>Fecha de cierre:</b><br> {{element.fecha2 | date: "mediumDate":"":"es"}}</span>                         
+                        </td>
+                    </ng-container>                                 
+                    <ng-container matColumnDef="descripcion">
+                        <th mat-header-cell *matHeaderCellDef style="width: 30%;"> Descripción </th>
+                        <td mat-cell *matCellDef="let element" style=" padding: 2em !important;"> 
+                            <b>Pregunta:</b> {{element.descripcion}} 
+                            <br>
+                            <br>
+                            <b>Respuesta:</b> {{element.comentarios}}
+                        </td>
+                    </ng-container>                                 
+                    <ng-container matColumnDef="notas">
+                        <th mat-header-cell *matHeaderCellDef> Notas </th>
+                        <td mat-cell *matCellDef="let element">                         
+                            {{element.notas}}                         
+                        </td>
+                    </ng-container>                               
+                    <ng-container matColumnDef="solucion">
+                        <th mat-header-cell *matHeaderCellDef> Solución </th>
+                        <td mat-cell *matCellDef="let element"> {{element.solucion}} </td>
+                    </ng-container>                       
+                    <ng-container matColumnDef="owner">
+                        <th mat-header-cell *matHeaderCellDef> Owner </th>
+                        <td mat-cell *matCellDef="let element">
+                             {{element.owner}} </td>
+                    </ng-container>                              
+                    <ng-container matColumnDef="imagenes">
+                        <th mat-header-cell *matHeaderCellDef> Imágenes </th>
+                        <td mat-cell *matCellDef="let element">
+                            <div *ngFor="let imagen of element.imagenes" style="margin-top: 20px; margin-bottom: 20px;">
+                                <button class="btn btn-light modal-hover-opacity" (click)="onClick($event, imagen)" data-toggle="modal" data-target="#imageModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                        <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
+                                      </svg> Ver imágen
+                                </button>
+                            </div>
+                        </td>
+                    </ng-container>                                      
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+                </table>                     
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="iniciarModal" tabindex="-1" data-backdrop="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p>Iniciar incidencia</p>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <label for="owner">Owner</label>
+                        <input type="text" class="form-control" id="owner" [(ngModel)]="ownerInput">
+                        
+                        <label for="notas">Notas</label>
+                        <textarea class="form-control" id="startModal" rows="3" [(ngModel)]="notasInput"></textarea> 
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" style="float: right;" #closebutton data-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger" style="float: right;" (click)="modificarIndencia(1)">Aceptar</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+    <div class="modal fade" id="terminarModal" tabindex="-1" data-backdrop="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p>Terminar incidencia</p>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">                            
+                            <label for="notas">Solución</label>
+                            <textarea class="form-control" id="endModal" rows="3" [(ngModel)]="solucionInput"></textarea> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" align="center">                                  
+                            <input type="file" accept="image/*" (change)="captureFile($event)" capture="environment">
+                            <label for="file-upload" class="custom-file-upload">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16">
+                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                            </svg> Subir imagen       
+                            </label><br>                            
+                            <input id="file-upload" type="file" (change)="captureFile($event)">
+                            <img [src]="previsualizacion" class="fotografia"><br>                            
+                        </div>
+                    </div>                           
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" style="float: right;" #closebutton data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-danger" style="float: right;" (click)="modificarIndencia(2)">Aceptar</button>
+                </div>
+            </div>
+        </div>
+      </div>
+    
+  <!-- Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" data-backdrop="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p>Editar incidencia</p>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <label for="owner">Owner</label>
+                        <input type="text" class="form-control" id="owner" [(ngModel)]="ownerInput">
+                        
+                        <label for="notas">Notas</label>
+                        <textarea class="form-control" id="editModal" rows="3" [(ngModel)]="notasInput"></textarea> 
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" style="float: right;" #closebutton data-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger" style="float: right;" (click)="modificarIndencia(3)">Aceptar</button>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="imageModal" tabindex="-1" data-backdrop="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" #closebutton class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <img
+            src="{{imgSrc}}"
+            style="max-width:100%; "
+            class="modal-hover-opacity"
+            /> 
+        </div>
+        </div>
+    </div>
+  </div>

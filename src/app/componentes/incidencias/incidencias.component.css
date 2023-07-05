@@ -1,0 +1,190 @@
+.contenedor{
+    padding-bottom: 35px;
+    width: 90%;
+    margin: 0px auto;
+  }
+  
+  .title{
+    font-size: 35px;
+    text-align: left;
+  }
+  
+  .subtitle{
+    font-size: 20px;
+    text-align: left;
+  }
+  
+  .line{
+    float: left;
+    border: 1px solid black;
+    width: 60%;
+  }
+  
+  .optionButton{
+    float: left;
+    margin-right: 10px;
+    background-color: white;
+    border: 1px solid white;
+    color: black;
+    border-radius: 5px;
+  }
+  
+  .optionButton:hover{
+    cursor: pointer;
+    background-color: white;
+    color: red;
+    border: 1px solid red;
+  }
+  
+  .active{
+    background-color: #E2231A;
+    color: white;
+    border: 1px solid white;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: red;
+    color: white;
+  }
+  
+  .modal { background: rgba(000, 000, 000, 0.8); min-height:1000000px; }
+  
+  .image{
+    width: 30%;
+    margin: 0px auto;
+    border-radius: 500px;
+  }
+  
+  input[type="file"] {
+    display: none;
+  }
+  
+  .custom-file-upload {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  
+
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 350px;
+  }
+  
+  @media screen and (max-width: 600px) {
+    canvas {
+      max-width: none;
+      margin-top: 30px;
+    }
+  }
+  
+
+  .demo-table {
+  width: 80%
+}
+
+.mat-column-position {
+  border-right: 1px solid currentColor;
+  padding-right: 24px;
+  text-align: center;
+}
+
+.mat-column-modulo {
+  padding-left: 16px;
+  font-size: 20px;
+}
+
+.mat-column-incidentes {
+  width: 32px;
+  font-size: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* .img:hover{
+  cursor: pointer;
+  color: #424242; 
+  -webkit-transition: all .3s ease-in;
+  -moz-transition: all .3s ease-in;
+  -ms-transition: all .3s ease-in;
+  -o-transition: all .3s ease-in;
+  transition: all .3s ease-in;
+  opacity: 1;
+  transform: scale(3.15);
+  -ms-transform: scale(3.15);
+  -webkit-transform: scale(3.15); 
+} */
+
+
+.cardTerminado{
+  color: white;
+  background-color: green;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.cardProceso{
+  color: white;
+  background-color: orange;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.cardPendiente{
+  color: white;
+  background-color: red;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.checkProceso{
+  cursor: pointer;
+  width: 100px;
+  border: 1px solid transparent;
+  margin: 10px;
+  background-color:#F8F9FA ;
+  color: black;
+}
+
+.checkEditar{
+  cursor: pointer;
+  width: 100px;
+  border: 1px solid transparent;
+  margin: 10px;
+  margin-top: 0px;
+  background-color:#F8F9FA ;
+  color: black;
+}
+
+.checkTerminado{
+  cursor: pointer;
+  width: 100px;
+  border: 1px solid transparent;
+  margin: 10px;
+  background-color:#F8F9FA ;
+  color: black;
+}
+
+.checkProceso:hover,.checkTerminado:hover  {
+  background-color: black;
+  color: #F8F9FA;
+}
+
+.checkEditar:hover{
+  background-color: black;
+  color: #F8F9FA;
+}
+
+.editNote:hover{
+  cursor: pointer;
+}

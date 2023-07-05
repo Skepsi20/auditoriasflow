@@ -81,6 +81,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
 import { LoginComponent } from './componentes/auth/login/login.component';
 import { SettingsComponent } from './componentes/ajustes/settings.component';
+import { IncidenciasComponent } from './componentes/incidencias/incidencias.component';
 
 FullCalendarModule.registerPlugins([ // register FullCalendar plugins
   dayGridPlugin,
@@ -112,6 +113,7 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     SpinnerComponent,
     LoginComponent,
     SettingsComponent,
+    IncidenciasComponent,
   ],
   imports: [
     BrowserModule,

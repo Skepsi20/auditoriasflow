@@ -7,6 +7,7 @@ import { PanelComponent } from './componentes/panel/panel.component';
 import { RolesGuard } from './componentes/auth/roles.guard';
 import { AlmacenComponent } from './componentes/forms/almacen/almacen.component';
 import { SettingsComponent } from './componentes/ajustes/settings.component';
+import { IncidenciasComponent } from './componentes/incidencias/incidencias.component';
 
 const routes: Routes = [
   {path:'', component: LoginComponent},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path:'forms', component: StampingComponent},
   {path:'panel', component: PanelComponent, canActivate:[RolesGuard], data:{expectedRole: ['Administrador']}},
   {path:'configuracion', component: SettingsComponent, canActivate:[RolesGuard], data:{expectedRole: ['Administrador']}},
+  {path:'incidencias', component: IncidenciasComponent, canActivate:[RolesGuard], data:{expectedRole: ['Administrador']}},
   {path:'prueba', component: AlmacenComponent},
   {path:'**', component: LoginComponent},
 
